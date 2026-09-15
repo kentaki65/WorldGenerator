@@ -1,0 +1,27 @@
+{
+  "name": "bloxd-world-generator",
+  "version": "1.0.0",
+  "description": "",
+  "homepage": "https://github.com/kentaki65/WorldGenerator#readme",
+  "bugs": {
+    "url": "https://github.com/kentaki65/WorldGenerator/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kentaki65/WorldGenerator.git"
+  },
+  "license": "MIT",
+  "author": "kentaki",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@isaacs/ttlcache": "^2.1.5",
+    "md5.js": "^1.3.5",
+    "ndarray": "^1.1.1",
+    "simplex-noise": "3.0.0",
+    "voxel-crunch": "^0.2.1"
+  }
+}
