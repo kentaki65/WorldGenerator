@@ -23,5 +23,8 @@
     "ndarray": "^1.1.1",
     "simplex-noise": "3.0.0",
     "voxel-crunch": "^0.2.1"
+  },
+  "devDependencies": {
+    "@types/ndarray": "^1.1.0"
   }
 }

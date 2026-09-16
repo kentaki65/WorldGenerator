@@ -1,4 +1,17 @@
+import { ChunkSize } from "@/core/constants.js";
 import { ClosestPointOnSegmentResult, Vec2, Vec3 } from "@/core/types.js";
+
+const shiftBits = Math.log2(ChunkSize) | 0;
+
+//YH
+export function divideByChunkSize(value: number): number {
+    return value >> shiftBits;
+}
+
+//QH
+export function multiplyByChunkSize(value: number): number {
+    return value << shiftBits;
+}
 
 //LH
 export function manhattanDistance(point: Vec3, x: number, y: number): number {
