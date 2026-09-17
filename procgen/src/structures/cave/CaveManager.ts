@@ -1,5 +1,5 @@
 import { CaveField, HeightField, OUT_OF_RUNGE_NUMBER } from "@/core/constants.js";
-import { BlockIds, Vec2 } from "@/core/types.js";
+import { BlockId, Vec2 } from "@/core/types.js";
 import { CaveDataView, InnerChunkCaveDataView } from "./CaveDataViewer.js";
 import { SeededRandom } from "@/noise/SeededRandom.js";
 import { ChunkDataCache4D } from "@/data/cache/ChunkDataCache4D.js";
@@ -14,7 +14,7 @@ export class CaveManager {
   constructor(
     caveGeneratorConfig: any,
     chunkSize: number,
-    caveTypeToBlockIds: BlockIds[],
+    caveTypeToBlockIds: BlockId[],
     caveTypePrioritization: any,
   ) {
     this.chunkSize = chunkSize;

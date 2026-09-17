@@ -1,3 +1,4 @@
+import { Seed } from "@/core/types.js";
 import SimplexNoise from "simplex-noise";
 
 //WH
@@ -5,7 +6,7 @@ export class SimpleOctavesNoise {
   simplexes: SimplexNoise[];
   customOctaves: any;
 
-  constructor(octaves: any, seed: string | number) {
+  constructor(octaves: any, seed: Seed) {
     if (seed === undefined) console.log("Seed must be defined");
 
     this.simplexes = [];

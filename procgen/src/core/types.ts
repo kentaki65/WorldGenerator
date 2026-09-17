@@ -1,5 +1,7 @@
 import blockMetadata from "./blockMetadata.json" with { type: "json"};
 
+export type Seed = number | string;
+
 export type Vec3 = [number, number, number];
 export type Vec2 = [number, number];
 
@@ -8,13 +10,18 @@ export type Range = {
   high: number;
 };
 
-export type BlockNames = keyof typeof blockMetadata;
-export type BlockIds = number;
+export type Octave = {
+  amplitude: number;
+  frequency: number;
+};
+
+export type BlockName = keyof typeof blockMetadata;
+export type BlockId = number;
 
 export type NumCaveTypes = number;
 
 export type BlockMetadata = {
-  [key in BlockNames]?: { id: number;[key: string]: any };
+  [key in BlockName]?: { id: number;[key: string]: any };
 };
 
 export interface WeightedItem {
@@ -43,6 +50,6 @@ export interface CaveHeightThreshold extends Range {
 
 export interface GroundHeightmap{
   chunkSize: number;
-  caveTypeToBlockIds: BlockIds[];
+  caveTypeToBlockIds: BlockId[];
   
 }

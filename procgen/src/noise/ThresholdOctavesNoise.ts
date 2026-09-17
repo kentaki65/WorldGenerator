@@ -1,10 +1,6 @@
 import { OUT_OF_RUNGE_NUMBER } from "@/core/constants.js";
+import { Octave } from "@/core/types.js";
 import SimplexNoise from "simplex-noise";
-
-type Octave = {
-  amplitude: number;
-  frequency: number;
-};
 
 type Threshold = {
   low: number;
@@ -12,7 +8,7 @@ type Threshold = {
 };
 
 //BH
-export class OctavesNoise {
+export class ThresholdOctaveNoise {
   _simplexes: SimplexNoise[];
   customOctaves: Octave[];
   threshold: Threshold;
