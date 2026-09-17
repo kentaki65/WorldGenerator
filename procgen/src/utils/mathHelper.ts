@@ -5,12 +5,12 @@ const shiftBits = Math.log2(ChunkSize) | 0;
 
 //YH
 export function divideByChunkSize(value: number): number {
-    return value >> shiftBits;
+  return value >> shiftBits;
 }
 
 //QH
 export function multiplyByChunkSize(value: number): number {
-    return value << shiftBits;
+  return value << shiftBits;
 }
 
 //LH
@@ -106,7 +106,7 @@ export function normalizeVector2(vector: Vec2): void {
 //型修正必要
 export function getTotalAmplitude(noiseGenerator: any): number {
   let totalAmplitude = 0;
-  
+
   for (const { amplitude } of noiseGenerator.customOctaves) totalAmplitude += amplitude;
   return totalAmplitude;
 }

@@ -1,5 +1,46 @@
 export const ChunkSize = 32;
 
+export const CaveMobs = [
+  "Cave Golem", 
+  "Draugr Zombie", 
+  "Draugr Skeleton", 
+  "Frost Golem", 
+  "Frost Zombie", 
+  "Frost Skeleton", 
+  "Draugr Knight", 
+  "Draugr Huntress", 
+  "Magma Golem"
+];
+
+export enum HeightField {
+  GroundHeight,
+  WaterHeight,
+  CavesAllowedBelowY,
+  NumFields
+}
+
+export enum CaveField {
+  FloorY,
+  CeilingY,
+  NumFields
+}
+
+export enum CaveLayer {
+  SURFACE,
+  UNDERGROUND
+}
+
+export enum FeatureHeight {
+  HIGH,
+  MEDIUM
+}
+
+export enum FixedPrefabField {
+  DistanceToNearestFixedPrefab,
+  HeightOfNearestFixedPrefab,
+  NumFields
+}
+
 export enum TreeType {
   Maple = 0,
   Pine = 1,
@@ -35,9 +76,9 @@ export enum TERRAIN_LEVELS {
 };
 
 //修正必要
-export enum outOfRangeNumber {
+export enum OUT_OF_RUNGE_NUMBER {
   mI = -10000,
-  ZH = -10000,
+  NO_CAVE_NUMBER = -10000,
   OUT_OF_RANGE = -10000,
 }
 

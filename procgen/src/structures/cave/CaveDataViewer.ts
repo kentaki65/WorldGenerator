@@ -1,0 +1,71 @@
+//numCaveTypesについて縛れるかもしれん
+
+import { CaveField } from "@/core/constants.js";
+import { BlockIds, NumCaveTypes } from "@/core/types.js";
+
+class CaveDataViewBase {
+  numCaveTypes: NumCaveTypes;
+  caveTypeToBlockIds: BlockIds[];
+  caveTypePrioritization: any;
+  chunkSize: number;
+
+  constructor(
+    numCaveTypes: NumCaveTypes,
+    caveTypeToBlockIds: BlockIds[],
+    caveTypePrioritization: any,
+    chunkSize: number,
+  ) {
+    this.numCaveTypes = numCaveTypes;
+    this.caveTypeToBlockIds = caveTypeToBlockIds;
+    this.caveTypePrioritization = caveTypePrioritization;
+    this.chunkSize = chunkSize;
+  }
+}
+
+export class CaveDataView extends CaveDataViewBase {
+  data: any;
+
+  constructor(
+    numCaveTypes: NumCaveTypes,
+    caveTypeToBlockIds: BlockIds[],
+    caveTypePrioritization: any,
+    chunkSize: number,
+    data: any
+  ) {
+    super(numCaveTypes, caveTypeToBlockIds, caveTypePrioritization, chunkSize);
+    this.data = data;
+  }
+
+  getOrGenerate(x: number, y: number, z: number, caveType: CaveField) {
+    return this.data.getOrGenerate(x, y, z, caveType);
+  }
+
+  viewJustInnerChunk() {
+    return new InnerChunkCaveDataView(
+      this.numCaveTypes,
+      this.caveTypeToBlockIds,
+      this.caveTypePrioritization,
+      this.chunkSize,
+      this.data.viewJustInnerChunk()
+    );
+  }
+}
+
+export class InnerChunkCaveDataView extends CaveDataViewBase {
+  data: any;
+
+  constructor(
+    numCaveTypes: NumCaveTypes,
+    caveTypeToBlockIds: BlockIds[],
+    caveTypePrioritization: any,
+    chunkSize: number,
+    data: any
+  ) {
+    super(numCaveTypes, caveTypeToBlockIds, caveTypePrioritization, chunkSize);
+    this.data = data;
+  }
+
+  getOrGenerate(x: number, y: number, z: number, caveType: CaveField) {
+    return this.data.get(x, y, z, caveType);
+  }
+}

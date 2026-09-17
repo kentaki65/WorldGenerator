@@ -1,4 +1,4 @@
-import { outOfRangeNumber } from "@/core/constants.js";
+import { OUT_OF_RUNGE_NUMBER } from "@/core/constants.js";
 import SimplexNoise from "simplex-noise";
 
 type Octave = {
@@ -48,7 +48,7 @@ export class OctavesNoise {
       if(!remainingAmplitude) continue;
 
       if (result - remainingAmplitude > this.threshold.high || result + remainingAmplitude < this.threshold.low) {
-        return outOfRangeNumber.OUT_OF_RANGE;
+        return OUT_OF_RUNGE_NUMBER.OUT_OF_RANGE;
       };
 
       const octave = this.customOctaves[index];

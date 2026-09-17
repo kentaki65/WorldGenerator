@@ -1,7 +1,7 @@
 import { Vec2 } from "@/core/types.js";
 import { Sparse4DArray } from "../array/Sparse4DArray.js";
 import { ChunkArray4D } from "../array/ChunkArray4D.js";
-import { emptyArray } from "@/core/constants.js";
+import { emptyArray, HeightField } from "@/core/constants.js";
 import { CombinedArray4D } from "../array/CombinedArray4D.js";
 
 //型修正必要
@@ -16,7 +16,7 @@ export class ChunkDataCache4D {
     this.outerSparseArray = new Sparse4DArray();
   }
 
-  static create(size: number, chunkBottomLeft: Vec2, dimension3: number, dimension4: number, generator: any) {
+  static create(size: number, chunkBottomLeft: Vec2, dimension3: number, dimension4: HeightField, generator: any) {
     const innerArray = new ChunkArray4D(size, chunkBottomLeft, dimension3, dimension4);
     for (let x = chunkBottomLeft[0]; x < chunkBottomLeft[0] + size; x++) {
       for (let y = chunkBottomLeft[1]; y < chunkBottomLeft[1] + size; y++) {
