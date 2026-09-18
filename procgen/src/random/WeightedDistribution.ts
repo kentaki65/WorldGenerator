@@ -1,15 +1,15 @@
 import { WeightedItem } from "@/core/types.js";
 import { SeededRandom } from "@/noise/SeededRandom.js";
 
-interface DistributionItem {
+interface DistributionItem<T> {
   cumulativeProbability: number;
-  value: number;
+  value: T;
 }
 
-export class WeightedDistribution {
-  distribution: DistributionItem[]
+export class WeightedDistribution<T> {
+  distribution: DistributionItem<T>[]
 
-  constructor(items: WeightedItem[]) {
+  constructor(items: WeightedItem<T>[]) {
     if (items.length <= 0) {
       throw new Error(
         `Distribution must have at least one item: ${JSON.stringify(items)}`
@@ -48,7 +48,7 @@ export class WeightedDistribution {
     });
   }
 
-  sample(random: SeededRandom) {
+  sample(random: SeededRandom): T {
     const randomValue = random.next();
 
     for (const item of this.distribution) {
@@ -57,9 +57,7 @@ export class WeightedDistribution {
       }
     }
 
-    const fallback = this.distribution[this.distribution.length - 1];
-    if(fallback === undefined) return;
-
+    const fallback = this.distribution[this.distribution.length - 1]!;
     return fallback.value;
   }
 }

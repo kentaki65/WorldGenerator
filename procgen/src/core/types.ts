@@ -3,6 +3,12 @@ import blockMetadata from "./blockMetadata.json" with { type: "json"};
 export type Seed = number | string;
 
 export type Vec3 = [number, number, number];
+
+export interface Vec3Object {
+  x: number;
+  y: number;
+  z: number;
+}
 export type Vec2 = [number, number];
 
 export type Range = {
@@ -24,15 +30,20 @@ export type BlockMetadata = {
   [key in BlockName]?: { id: number;[key: string]: any };
 };
 
-export interface WeightedItem {
-  value: number;
+export interface CaveInterval {
+  floorY: number;
+  ceilingY: number;
+}
+
+export interface WeightedItem<T> {
+  value: T;
   weight: number;
 }
 
 export interface TTLCacheOption {
   ttl: number;
   max: number;
-  updateAgeOnGet: boolean;
+  updateAgeOnGet?: boolean;
   keySeparator: string;
 }
 
@@ -52,4 +63,14 @@ export interface GroundHeightmap{
   chunkSize: number;
   caveTypeToBlockIds: BlockId[];
   
+}
+
+export interface FixedPointPrefabInfo {
+  schematic: any;
+  bottomLeftX: number;
+  bottomLeftZ: number;
+  floorY: number;
+  ceilingY: number;
+  topRightX: number;
+  topRightZ: number;
 }

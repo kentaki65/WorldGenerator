@@ -1,0 +1,136 @@
+import { _TypeOf } from "@/core/index.js";
+import { Probability } from "@/random/Probability.js";
+import { RandomIntRange } from "@/random/RandomIntRange.js";
+import { WeightedDistribution } from "@/random/WeightedDistribution.js";
+
+export class LootChestGenerator {
+  itemCategoryDistributions: {
+    numItemsDistribution: RandomIntRange;
+    itemDistribution: WeightedDistribution<{
+      name: string;
+      amountDistribution: RandomIntRange | null;
+      attributesDistribution: unknown | null;
+    }>;
+  }[];
+
+  shouldEnchantDistribution: Probability;
+  enchantmentTier: _TypeOf["enchantmentTiers"];
+
+  constructor(metadata: {
+    itemCategories: {
+      minItems: number;
+      maxItems: number;
+      items: {
+        name: string;
+        frequency: number;
+        amount?: {
+          min: number;
+          max: number;
+        };
+        itemAttributesDistribution?: unknown;
+      }[];
+    }[];
+    enchantmentProbability: number;
+    enchantmentTier: _TypeOf["enchantmentTiers"];
+  }) {
+    this.itemCategoryDistributions = [];
+    this.shouldEnchantDistribution = new Probability(
+      metadata.enchantmentProbability
+    );
+    this.enchantmentTier = metadata.enchantmentTier;
+
+    for (const category of metadata.itemCategories) {
+      const numItemsDistribution = new RandomIntRange(
+        category.minItems,
+        category.maxItems + 1
+      );
+
+      const items = [];
+
+      for (const item of category.items) {
+        const amountDistribution = item.amount
+          ? new RandomIntRange(item.amount.min, item.amount.max + 1)
+          : null;
+
+        const attributesDistribution =
+          item.itemAttributesDistribution ?? null;
+
+        items.push({
+          weight: item.frequency,
+          value: {
+            name: item.name,
+            amountDistribution,
+            attributesDistribution,
+          },
+        });
+      }
+
+      const itemDistribution = new WeightedDistribution(items);
+
+      this.itemCategoryDistributions.push({
+        numItemsDistribution,
+        itemDistribution,
+      });
+    }
+  }
+
+  sample(random: any): any[] {
+    const items = Array<any | null>(36).fill(null);
+    let itemIndex = 0;
+
+    for (const category of this.itemCategoryDistributions) {
+      const numItems = category.numItemsDistribution.sample(random);
+
+      for (let i = 0; i < numItems; i++, itemIndex++) {
+        const item = category.itemDistribution.sample(random);
+        const name = item.name;
+
+        const amount = item.amountDistribution?.sample(random) ?? null;
+        const attributes = item.attributesDistribution?.sample(random) ?? {};
+
+        const enchantmentAttributes =
+          this.getEnchantmentAttributesForItem(random, name) ?? {};
+
+        items[itemIndex] = {
+          name,
+          amount,
+          attributes: {
+            ...attributes,
+            customAttributes: {
+              ...(attributes.customAttributes ?? {}),
+              ...enchantmentAttributes,
+            },
+          },
+        };
+      }
+    }
+
+    for (let i = 0; i < items.length; i++) {
+      const j = i + Math.floor(random.next() * (items.length - i));
+      [items[i], items[j]] = [items[j], items[i]];
+    }
+
+    return items;
+  }
+
+  getEnchantmentAttributesForItem(
+    random: any,
+    itemName: string
+  ) {
+    if (!this.shouldEnchantDistribution.sample(random)) {
+      return null;
+    }
+
+    const enchantments = EE.getPossibleEnchantmentsForItem(itemName);
+
+    if (enchantments.length === 0) {
+      return null;
+    }
+
+    return EE.chooseRandomEnchantmentAttributes(
+      random,
+      this.enchantmentTier,
+      enchantments
+    );
+  }
+}

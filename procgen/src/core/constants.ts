@@ -75,11 +75,23 @@ export enum TERRAIN_LEVELS {
   bedrockLevel = -100
 };
 
+export enum BlockPlacementMode {
+  GUARANTEED_AIR = -1,
+}
+
 //修正必要
 export enum OUT_OF_RUNGE_NUMBER {
   mI = -10000,
   NO_CAVE_NUMBER = -10000,
   OUT_OF_RANGE = -10000,
+}
+
+export enum MaterialTier {
+  WOOD = "Wood",
+  STONE = "Stone",
+  IRON = "Iron",
+  GOLD = "Gold",
+  DIAMOND = "Diamond",
 }
 
 export const emptyArray = {
