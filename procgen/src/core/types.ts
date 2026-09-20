@@ -1,8 +1,13 @@
 import { MobNameGenerator } from "@/structures/lootChest/MobNameGenerator.js";
-import blockMetadata from "./blockMetadata.json" with { type: "json"};
+import _blockMetadata from "./blockMetadata.json" with { type: "json" };
+import type RawJsonType from "./blockMetadata.json";
+export const blockMetadata = _blockMetadata as typeof RawJsonType;
 import { RandomIntRange } from "@/random/RandomIntRange.js";
 import { WeightedDistribution } from "@/random/WeightedDistribution.js";
-import { CaveMobs, TreeType } from "./constants.js";
+import { CaveMobs, Rarity, TreeType } from "./constants.js";
+import { prefabDefinitions } from "@/structures/prefab/prefabDatas/prefabDefinitions.js";
+import { OreGenerator } from "@/structures/ore/oreGenerator.js";
+import { Sparse3DMap } from "@/data/array/Sparse3DMap.js";
 
 export type Seed = number | string;
 export type Vec3 = [number, number, number];
@@ -39,14 +44,13 @@ export type BlockId = number;
 
 export type NumCaveTypes = number;
 
-export type BlockMetadata = {
-  [key in BlockName]?: { id: number;[key: string]: any };
-};
+export type BlockMetadata = Record<string, {
+  id: number;
+}>;
 
 export interface ChunkArray {
   set(x: number, y: number, z: number, id: BlockId): void;
 }
-
 
 export interface CaveInterval {
   floorY: number;
@@ -63,6 +67,12 @@ export interface TTLCacheOption {
   max: number;
   updateAgeOnGet?: boolean;
   keySeparator: string;
+}
+
+export interface ClosestPoints {
+  pt: Vec2;
+  distDiffFromFirstPt: number;
+  weight: number;
 }
 
 export interface ClosestPointOnSegmentResult {
@@ -160,4 +170,49 @@ export interface TreePlacement {
   height: number;
   treeType: TreeType;
   vineDir?: number
+}
+
+export interface PrefabFrequency {
+  prefabName: keyof typeof prefabDefinitions;
+  frequency: number;
+}
+
+export interface PrefabFrequencySettings {
+  density: number;
+  frequencyParams: {
+    noPrefabFrequency: number;
+    prefabFrequencies: PrefabFrequency[];
+  };
+}
+
+export interface BiomeConstructorOptions {
+  oreGenerator: OreGenerator;
+  [key: string]: any;
+}
+
+export interface PrefabPlacement {
+  centreX: number;
+  centreZ: number;
+  anchorX: number;
+  anchorZ: number;
+  prefab: Prefab;
+  xRotationOffset: number | null;
+  zRotationOffset: number | null;
+  shouldSwapXZ: boolean;
+}
+
+export interface PrefabInstance extends PrefabPlacement {
+  anchorY: number;
+  decodedPrefabSchematic: any;
+  chestLocationToQuality: Sparse3DMap<Rarity>;
+  spawnerBlockLocationToBlockId: Sparse3DMap<BlockId>;
+  blockIdMapping: any;
+}
+
+export interface GeneratedPrefabPlacement extends PrefabPlacement {
+  anchorY: number;
+  chestLocationToQuality: Sparse3DMap<Rarity>;
+  spawnerBlockLocationToBlockId: Sparse3DMap<BlockId>;
+  blockIdMapping: any;
+  decodedPrefabSchematic: any;
 }

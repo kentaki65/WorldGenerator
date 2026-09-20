@@ -1,4 +1,4 @@
-import { Vec2 } from "@/core/types.js";
+import { ClosestPoints, Vec2 } from "@/core/types.js";
 import { PartitionedTTLCache } from "@/data/cache/PartitionedTTLCache.js";
 import { PartitionTTLCache } from "@/data/cache/PartitionTTLCache.js";
 import { SeededRandom } from "@/noise/SeededRandom.js";
@@ -167,7 +167,7 @@ export class PointsGenerator {
   }
 
   _getClosestPointsForGeneratedCell(cell: PointsGeneratorCell, x: number, z: number, distance: number) {
-    let closestPoint = [0, 0];
+    let closestPoint: Vec2 = [0, 0];
     let closestDistance = 100000;
 
     if (!cell.surroundingPoints) return;
@@ -181,7 +181,7 @@ export class PointsGenerator {
       }
     }
 
-    const closestPoints = [{
+    const closestPoints: ClosestPoints[] = [{
       pt: closestPoint,
       distDiffFromFirstPt: 0,
       weight: 0

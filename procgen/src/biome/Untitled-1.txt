@@ -1,0 +1,23 @@
+| 元クラス | 命名候補                   | バイオーム          | 根拠・特徴                                                     |
+| ---- | ---------------------- | -------------- | --------------------------------------------------------- |
+| `eR` | `Desert`               | **Desert（砂漠）** | `Sand`、サボテン、`DesertBiomeHeightMap`                        |
+| `GR` | `CactusDesert`         | **サボテン砂漠**     | `Desert` の派生で `cactusChance = 0.05`。通常の `0.0006` より圧倒的に多い |
+| `AR` | `RedDesert`            | **赤砂漠**        | `Red Sand`、`RedDesert`                                    |
+| `VR` | `Plains`               | **平原**         | `Plains`、草・花・スイカ・綿など                                      |
+| `YR` | `TallGrassPlains`      | **草原系平原？**     | `Plains` の派生で tall grass が `0.016 → 0.12`                 |
+| `QR` | `MaplePlains`          | **メープル平原？**    | Maple treeを配置、草・花が多い、cornあり                               |
+| `JR` | `SnowyPlains`          | **雪原**         | `Plains` 派生、Snow/Ice、植物ほぼ無し                               |
+| `OR` | `Forest`               | **森林**         | `Forest`、木・キノコ・メロン                                        |
+| `rR` | `PumpkinForest`        | **カボチャ森林？**    | Forest派生、Pumpkinあり、Aspenなし                                |
+| `FR` | `PearForest`           | **ナシの森林？**     | Forest派生、Pear tree                                        |
+| `MR` | `AutumnForest`         | **秋の森林**       | `AUTUMN` tag、Autumn Maple/Aspen、落ち葉                       |
+| `NR` | `Jungle`               | **ジャングル**      | Jungle Grass、Jungle/Palm/Mango tree、Jungle rocks          |
+| `ih` | `PineForest`           | **松林**         | Pine Grass、Pine/Fir系、Pine tree 15                         |
+| `DR` | `SnowyPineForest`      | **雪の松林**       | `PineForest` 派生、Snow/Ice、松の出現率低下                          |
+| `PR` | `BlueForest`           | **青い森林？**      | クラス自身が `Blue` と命名、Bluebell中心                              |
+| `XR` | `CherryForest`         | **桜の森林**       | Cherry tree 15、Cherry leaves                              |
+| `mh` | `RollingHills`         | **なだらかな丘陵**    | `RollingHills`、高さノイズの振幅20                                 |
+| `ZR` | `SnowyMountains`       | **雪山**         | `SnowyMountains`、ridged noise、高低差大                        |
+| `qR` | `FrozenBadlandsPlains` | **凍った荒地の平原**   | `FrozenBadlandsPlainsHeightMap`、Packed Snow、Snow、Ice      |
+| `LR` | `FrozenBadlandsForest` | **凍った荒地の森林**   | `FrozenBadlandsForestHeightMap`、Snow/Ice、Spectral tree    |
+| `gR` | `CustomBiome`          | **カスタムバイオーム**  | `Custom_${...}_${...}`、土壌ブロックを引数から指定                      |

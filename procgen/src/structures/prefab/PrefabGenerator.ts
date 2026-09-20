@@ -1,5 +1,5 @@
 import { BlockPlacementMode, CaveMobs, ChunkSize, HeightField, OUT_OF_RUNGE_NUMBER, Rarity } from "@/core/constants.js";
-import { BlockId, CaveInterval, CaveMobNames, Prefab, PrefabConfig, Seed, Vec2 } from "@/core/types.js";
+import { BlockId, CaveInterval, CaveMobNames, GeneratedPrefabPlacement, Prefab, PrefabCenter, PrefabConfig, PrefabInstance, PrefabPlacement, Seed, Vec2 } from "@/core/types.js";
 import { Sparse3DMap } from "@/data/array/Sparse3DMap.js";
 import { EnchantmentGenerator } from "@/enchantment/EnchantmentGenerator.js";
 import { PointsGenerator } from "@/generator/PointsGenerator.js";
@@ -19,41 +19,6 @@ import voxelCrunch from 'voxel-crunch';
 import { LootChestBlockGenerator } from "../lootChest/LootChestBlockGenerator.js";
 
 type PrefabCentrePointGenerators = Record<number, Record<number, PointsGenerator | null>>
-
-interface PrefabCenter {
-  centreX: number;
-  centreZ: number;
-  prefab: {
-    clearingRadiusSquared: number;
-  }
-}
-
-interface PrefabPlacement {
-  centreX: number;
-  centreZ: number;
-  anchorX: number;
-  anchorZ: number;
-  prefab: Prefab;
-  xRotationOffset: number | null;
-  zRotationOffset: number | null;
-  shouldSwapXZ: boolean;
-}
-
-interface PrefabInstance extends PrefabPlacement {
-  anchorY: number;
-  decodedPrefabSchematic: any;
-  chestLocationToQuality: Sparse3DMap<Rarity>;
-  spawnerBlockLocationToBlockId: Sparse3DMap<BlockId>;
-  blockIdMapping: any;
-}
-
-interface GeneratedPrefabPlacement extends PrefabPlacement {
-  anchorY: number;
-  chestLocationToQuality: Sparse3DMap<Rarity>;
-  spawnerBlockLocationToBlockId: Sparse3DMap<BlockId>;
-  blockIdMapping: any;
-  decodedPrefabSchematic: any;
-}
 
 export class PrefabGenerator {
   seed: Seed;

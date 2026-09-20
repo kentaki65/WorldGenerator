@@ -3,7 +3,7 @@ import { ChunkArray2DWithPadding } from "../array/ChunkArray2DWithPadding.js";
 
 //型の修正必要
 //dH
-export class ChunkGeneratorCache2D {
+export class ChunkGeneratorCache {
   innerContiguousArray: any;
   generator: any;
   outerSparseArray: any;
@@ -24,7 +24,7 @@ export class ChunkGeneratorCache2D {
       }
     }
 
-    return new ChunkGeneratorCache2D(array, generator);
+    return new ChunkGeneratorCache(array, generator);
   }
 
   getOrGenerate(x: number, y: number) {

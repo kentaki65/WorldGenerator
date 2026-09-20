@@ -112,3 +112,20 @@ export function getTotalAmplitude(noiseGenerator: SimpleOctavesNoise | Threshold
   for (const { amplitude } of noiseGenerator.customOctaves) totalAmplitude += amplitude;
   return totalAmplitude;
 }
+
+//修正必要
+export function interpolateClusterValue(clusterSettings: any, y: number) {
+  const {
+    mE: minValue,
+    ZI: maxValue,
+    shallowClusterY,
+    deepClusterY
+  } = clusterSettings;
+
+  if (maxValue === undefined || shallowClusterY === undefined || deepClusterY === undefined) {
+    return minValue;
+  }
+
+  return minValue + (maxValue - minValue) *
+    Math.max(0, Math.min(1, (shallowClusterY - y) / (shallowClusterY - deepClusterY)));
+}
