@@ -1,5 +1,5 @@
 import { CaveField, HeightField, OUT_OF_RUNGE_NUMBER } from "@/core/constants.js";
-import { getDistance, getDistanceToSegment } from "@/utils/mathHelper.js";
+import { getDistance, getDistanceToSegment } from "@/utils/MathHelper.js";
 
 export class CaveGenerator {
   heightmapVals: any;

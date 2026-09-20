@@ -4,6 +4,7 @@ import { CaveDataView, InnerChunkCaveDataView } from "./CaveDataViewer.js";
 import { SeededRandom } from "@/noise/SeededRandom.js";
 import { ChunkDataCache4D } from "@/data/cache/ChunkDataCache4D.js";
 import { CaveGeneratorManager } from "./CaveGeneratorManager.js";
+import { CaveMetadataManager } from "./CaveMetadataManager.js";
 
 type CaveData = CaveDataView | InnerChunkCaveDataView;
 
@@ -19,7 +20,7 @@ export class CaveManager {
   ) {
     this.chunkSize = chunkSize;
     //洞窟の本体クラス
-    this.caveMetadataForChunkCache = new cI(
+    this.caveMetadataForChunkCache = new CaveMetadataManager(
       caveGeneratorConfig,
       chunkSize,
       caveTypeToBlockIds,

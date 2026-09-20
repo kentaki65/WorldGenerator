@@ -1,5 +1,5 @@
 import { ChunkSize } from "@/core/constants.js";
-import { divideByChunkSize } from "@/utils/mathHelper.js";
+import { divideByChunkSize } from "@/utils/MathHelper.js";
 
 export class CaveGeneratorManager {
   caveMetadataForChunkCache: any;

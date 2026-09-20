@@ -27,6 +27,7 @@
   },
   "devDependencies": {
     "@types/ndarray": "1.1.0",
-    "@types/poisson-disk-sampling": "^2.2.4"
+    "@types/poisson-disk-sampling": "^2.2.4",
+    "typescript": "5.9"
   }
 }

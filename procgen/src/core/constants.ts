@@ -10,7 +10,7 @@ export const CaveMobs = [
   "Draugr Knight", 
   "Draugr Huntress", 
   "Magma Golem"
-];
+] as const;
 
 export enum HeightField {
   GroundHeight,
@@ -81,7 +81,7 @@ export enum BlockPlacementMode {
 
 //修正必要
 export enum OUT_OF_RUNGE_NUMBER {
-  mI = -10000,
+  NO_WATER_VALUE = -10000,
   NO_CAVE_NUMBER = -10000,
   OUT_OF_RANGE = -10000,
 }
@@ -92,6 +92,33 @@ export enum MaterialTier {
   IRON = "Iron",
   GOLD = "Gold",
   DIAMOND = "Diamond",
+}
+
+export enum CanopyType {
+  STANDARD = 0,
+  FRILLED = 1,
+  TALL = 2,
+  FLAT = 3,
+  DROOPY = 4
+}
+
+export enum CanopyLevel {
+  TOP = 0,
+  UPPER_MIDDLE = 1,
+  MIDDLE = 2,
+  LOWER_MIDDLE = 3,
+  BOTTOM = 4
+}
+
+export enum CanopyShape {
+  CIRCLE = 0,
+  DIAMOND = 1
+}
+
+export enum CanopyBlockPlacement {
+  ALWAYS = 0,
+  SOMETIMES = 1,
+  NEVER = 2
 }
 
 export const emptyArray = {

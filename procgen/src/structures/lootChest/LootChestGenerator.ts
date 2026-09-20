@@ -1,37 +1,23 @@
 import { _TypeOf } from "@/core/index.js";
+import { FrequenciesItems, LootItem } from "@/core/types.js";
 import { Probability } from "@/random/Probability.js";
 import { RandomIntRange } from "@/random/RandomIntRange.js";
 import { WeightedDistribution } from "@/random/WeightedDistribution.js";
 
 export class LootChestGenerator {
-  itemCategoryDistributions: {
-    numItemsDistribution: RandomIntRange;
-    itemDistribution: WeightedDistribution<{
-      name: string;
-      amountDistribution: RandomIntRange | null;
-      attributesDistribution: unknown | null;
-    }>;
-  }[];
+  itemCategoryDistributions: LootItem[];
 
   shouldEnchantDistribution: Probability;
-  enchantmentTier: _TypeOf["enchantmentTiers"];
+  enchantmentTier: (_TypeOf["enchantmentTiers"])[number];
 
   constructor(metadata: {
     itemCategories: {
       minItems: number;
       maxItems: number;
-      items: {
-        name: string;
-        frequency: number;
-        amount?: {
-          min: number;
-          max: number;
-        };
-        itemAttributesDistribution?: unknown;
-      }[];
+      items: FrequenciesItems[];
     }[];
     enchantmentProbability: number;
-    enchantmentTier: _TypeOf["enchantmentTiers"];
+    enchantmentTier: (_TypeOf["enchantmentTiers"])[number]
   }) {
     this.itemCategoryDistributions = [];
     this.shouldEnchantDistribution = new Probability(
@@ -52,8 +38,7 @@ export class LootChestGenerator {
           ? new RandomIntRange(item.amount.min, item.amount.max + 1)
           : null;
 
-        const attributesDistribution =
-          item.itemAttributesDistribution ?? null;
+        const attributesDistribution = item.itemAttributesDistribution ?? null;
 
         items.push({
           weight: item.frequency,
@@ -88,8 +73,7 @@ export class LootChestGenerator {
         const amount = item.amountDistribution?.sample(random) ?? null;
         const attributes = item.attributesDistribution?.sample(random) ?? {};
 
-        const enchantmentAttributes =
-          this.getEnchantmentAttributesForItem(random, name) ?? {};
+        const enchantmentAttributes = this.getEnchantmentAttributesForItem(random, name) ?? {};
 
         items[itemIndex] = {
           name,

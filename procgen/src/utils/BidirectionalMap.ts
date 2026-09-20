@@ -19,7 +19,7 @@ export class BidirectionalMap {
     this.valueToKeyTable = valueToKeyTable;
   }
 
-  get(key: string): any {
+  get(key: number): number {
     return this.keyToValueTable[key];
   }
 

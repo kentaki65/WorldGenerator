@@ -2,7 +2,7 @@ import { Vec2 } from "@/core/types.js";
 import { PartitionedTTLCache } from "@/data/cache/PartitionedTTLCache.js";
 import { PartitionTTLCache } from "@/data/cache/PartitionTTLCache.js";
 import { SeededRandom } from "@/noise/SeededRandom.js";
-import { getDistance } from "@/utils/mathHelper.js";
+import { getDistance } from "@/utils/MathHelper.js";
 import PoissonDiskSampling from 'poisson-disk-sampling';
 
 interface PointsGeneratorCell {
@@ -30,7 +30,11 @@ export class PointsGenerator {
   minDist: number;
   cachedCells: PartitionTTLCache;
   _tempCellCoord: Vec2;
-  variableDensitySettings: any | null;
+  variableDensitySettings: {
+    func: (point: Vec2) => number;
+    min: number;
+    max: number;
+  } | null = null;
   useJitteredGrid: boolean;
   customCellGap: any | undefined;
   gridSize: number;
@@ -46,9 +50,13 @@ export class PointsGenerator {
     seed: string | number,
     gridSizeMultiplier: number,
     chunkSize: number,
-    variableDensitySettings = null,
+    variableDensitySettings: {
+      func: (point: Vec2) => number;
+      min: number;
+      max: number;
+    } | null = null,
     useJitteredGrid = false,
-    customCellGap = undefined
+    customCellGap: number | undefined = undefined
   ) {
     this.name = name;
     this.seed = seed;
@@ -102,12 +110,12 @@ export class PointsGenerator {
     return !!pointsSet.has(`${x}|${z}`);
   }
 
-  getClosestPoint(x: number, z: number) {
+  getClosestPoint(x: number, z: number): Vec2 {
     const cellCoord = this.getCellCoordFromGlobalCoord(x, z);
     const cell = this.getCell(cellCoord[0], cellCoord[1]);
     const surroundingPoints = this._getPointsSurroundingCell(cellCoord, cell);
 
-    let closestPoint = [0, 0];
+    let closestPoint: Vec2 = [0, 0];
     let closestDistance = 10000;
 
     for (const point of surroundingPoints) {

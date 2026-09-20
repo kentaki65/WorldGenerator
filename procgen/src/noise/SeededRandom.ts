@@ -13,7 +13,7 @@ export class SeededRandom {
     this.a = hash;
   }
 
-  next() {
+  next(): number {
     let state = this.a += 1831565813;
     state = Math.imul(state ^ state >>> 15, state | 1);
     state ^= state + Math.imul(state ^ state >>> 7, state | 61);

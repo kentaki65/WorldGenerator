@@ -1,4 +1,5 @@
-import { mobNamePrefixDistribution } from "./LootChestDatas.js";
+import { ItemAttributes } from "@/core/types.js";
+import { mobNamePrefixDistribution } from "../../utils/randomValues.js";
 
 export class MobNameGenerator {
   mobType: string;
@@ -7,14 +8,7 @@ export class MobNameGenerator {
     this.mobType = mobType;
   }
 
-  sample(random: any): {
-    customDisplayName: string;
-    customAttributes: {
-      mobSettings: {
-        name: string;
-      };
-    };
-  } {
+  sample(random: any): ItemAttributes{
     const prefix = mobNamePrefixDistribution.sample(random);
     const name = `${prefix} ${this.mobType}`;
 

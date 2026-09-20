@@ -1,10 +1,10 @@
-import { BlockMetadata, BlockName } from "@/core/types.js";
+import { BlockMetadata } from "@/core/types.js";
 
 export function isFalsy(value: any): boolean {
   return value === undefined || value === null;
 }
 
-export function getBlockId(blockName: BlockName, blockMetadata: BlockMetadata): number {
+export function getBlockId(blockName: string, blockMetadata: BlockMetadata): number {
   if (blockName === "Air") {
     return 0;
   }

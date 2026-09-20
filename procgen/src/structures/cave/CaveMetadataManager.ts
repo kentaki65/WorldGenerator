@@ -10,7 +10,7 @@ import { RandomRange } from "@/random/RandomRange.js";
 import { WeightedDistribution } from "@/random/WeightedDistribution.js";
 import { getBlockId, isFalsy } from "@/utils/utils.js";
 import { CaveGenerator } from "./CaveGenerator.js";
-import { multiplyByChunkSize, normalizeVector2 } from "@/utils/mathHelper.js";
+import { multiplyByChunkSize, normalizeVector2 } from "@/utils/MathHelper.js";
 import { SeededRandom } from "@/noise/SeededRandom.js";
 
 interface PitCaveMetadata {

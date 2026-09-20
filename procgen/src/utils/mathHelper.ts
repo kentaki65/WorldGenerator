@@ -1,5 +1,7 @@
 import { ChunkSize } from "@/core/constants.js";
-import { ClosestPointOnSegmentResult, Vec2, Vec3 } from "@/core/types.js";
+import { ClosestPointOnSegmentResult, Vec2 } from "@/core/types.js";
+import { SimpleOctavesNoise } from "@/noise/SimpleOctaveNoise.js";
+import { ThresholdOctaveNoise } from "@/noise/ThresholdOctavesNoise.js";
 
 const shiftBits = Math.log2(ChunkSize) | 0;
 
@@ -14,7 +16,7 @@ export function multiplyByChunkSize(value: number): number {
 }
 
 //LH
-export function manhattanDistance(point: Vec3, x: number, y: number): number {
+export function manhattanDistance(point: Vec2, x: number, y: number): number {
   return Math.abs(point[0] - x) + Math.abs(point[1] - y);
 }
 
@@ -70,7 +72,7 @@ export function getClosestPointOnSegment(point: Vec2, segmentStart: Vec2, segmen
   }
 
   return {
-    distance: getDistance(point, closestX, closestY),
+    alongCoord: getDistance(point, closestX, closestY),
     fracAlong: fractionAlongSegment,
     lineSegmentLength: Math.sqrt(segmentLengthSquared)
   };
@@ -104,7 +106,7 @@ export function normalizeVector2(vector: Vec2): void {
 
 //UH
 //型修正必要
-export function getTotalAmplitude(noiseGenerator: any): number {
+export function getTotalAmplitude(noiseGenerator: SimpleOctavesNoise | ThresholdOctaveNoise ): number {
   let totalAmplitude = 0;
 
   for (const { amplitude } of noiseGenerator.customOctaves) totalAmplitude += amplitude;

@@ -1,7 +1,9 @@
-export function normalizeFrequencies<T extends { frequency: number }>(
-  items: T[],
+import { FrequenciesItems } from "@/core/types.js";
+
+export function normalizeFrequencies(
+  items: FrequenciesItems[],
   targetTotal: number
-): T[] {
+) {
   let totalFrequency = 0;
 
   for (const item of items) {
