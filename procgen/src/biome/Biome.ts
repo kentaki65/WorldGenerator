@@ -7,6 +7,7 @@ import { createPrefabFrequencySettings } from "./biomeUtils.js";
 import { dungeonPrefabFrequencies } from "@/structures/prefab/prefabDatas/prefabFrequencies.js";
 import { prefabDefinitions } from "@/structures/prefab/prefabDatas/prefabDefinitions.js";
 import { SimpleOctavesNoise } from "@/noise/SimpleOctaveNoise.js";
+import { WorldGenerator } from "@/generator/WorldGenerator.js";
 
 interface PrefabFrequencyParams {
   prefabFrequencies: PrefabFrequency[];
@@ -39,7 +40,7 @@ export class Biome {
   topsoilBlockType!: number;
   lowsoilBlockType!: number;
   topwaterBlockType!: number;
-  blockMetadata!: any;
+  blockMetadata!: BlockMetadata;
   chunkSize!: number;
   treeMinDist: number | null = 5;
   _heightmapSimplex!: SimpleOctavesNoise;
@@ -112,7 +113,7 @@ export class Biome {
   constructor(
     chunkSize: number,
     blockMetadata: BlockMetadata,
-    worldGenerator: any,
+    worldGenerator: WorldGenerator,
     seed: Seed,
     options: BiomeConstructorOptions,
     surfacePrefabDensitySetting: PrefabDensitySetting | null = null

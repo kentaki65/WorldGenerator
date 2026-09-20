@@ -2,13 +2,14 @@ import { SimpleOctavesNoise } from "@/noise/SimpleOctaveNoise.js";
 import { Forest } from "./Forest.js";
 import { createPrefabFrequencySettings } from "../biomeUtils.js";
 import { FeatureHeight } from "@/core/constants.js";
-import { BiomeConstructorOptions, Seed } from "@/core/types.js";
+import { BiomeConstructorOptions, BlockMetadata, Seed } from "@/core/types.js";
+import { WorldGenerator } from "@/generator/WorldGenerator.js";
 
 export class FrozenBadlandsForest extends Forest {
   constructor(
     chunkSize: number,
-    blockMetadata: any,
-    worldGenerator: any,
+    blockMetadata: BlockMetadata,
+    worldGenerator: WorldGenerator,
     seed: Seed,
     options: BiomeConstructorOptions
   ) {

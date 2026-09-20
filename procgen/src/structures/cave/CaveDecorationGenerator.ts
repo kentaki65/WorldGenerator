@@ -1,4 +1,4 @@
-import { ChunkArray, Seed } from "@/core/types.js";
+import { BlockMetadata, ChunkArray, ClusterSettings, Seed } from "@/core/types.js";
 import { PointsGenerator } from "@/generator/PointsGenerator.js";
 import { createClusterSettings, selectAvailableOffset } from "./CaveUtils.js";
 import { CaveDataProvider } from "./CaveDataProvider.js";
@@ -30,10 +30,10 @@ export class CaveDecorationGenerator {
   maxHalfBox: number;
 
   constructor(
-    blockMetadata: any,
+    blockMetadata: BlockMetadata,
     chunkSize: number,
     seed: Seed,
-    clusterConfigs: any[] | null = null
+    clusterConfigs: ClusterSettings[] | null = null
   ) {
     this.chunkSize = chunkSize;
     this.seed = seed;

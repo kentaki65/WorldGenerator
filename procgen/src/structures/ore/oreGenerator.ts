@@ -1,5 +1,5 @@
 import { HeightField } from "@/core/constants.js";
-import { BlockId, BlockName, ChunkArray, Seed } from "@/core/types.js";
+import { BlockId, BlockMetadata, BlockName, ChunkArray, Seed } from "@/core/types.js";
 import { PointsGenerator } from "@/generator/PointsGenerator.js";
 import { SeededRandom } from "@/noise/SeededRandom.js";
 import { manhattanDistance } from "@/utils/MathHelper.js";
@@ -67,7 +67,7 @@ export class OreGenerator {
   oreTypes: OreType[];
 
   constructor(
-    blockMetadata: any,
+    blockMetadata: BlockMetadata,
     seed: Seed,
     chunkSize: number,
     oreConfigList: OreConfig[]

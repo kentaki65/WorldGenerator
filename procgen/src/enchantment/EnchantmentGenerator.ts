@@ -1,3 +1,4 @@
+import { SeededRandom } from "@/noise/SeededRandom.js";
 import { generateRandomId } from "@/random/generateRandomId.js";
 
 const MAX_ENCHANTMENT_COUNT = 3;
@@ -62,7 +63,7 @@ export class EnchantmentGenerator {
   }
 
   chooseRandomEnchantmentAttributes(
-    random: any,
+    random: SeededRandom,
     enchantmentTier: EnchantmentTier,
     enchantments: string[]
   ) {

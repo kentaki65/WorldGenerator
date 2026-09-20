@@ -1,7 +1,13 @@
 import { ChunkSize } from "@/core/constants.js";
-import { ClosestPointOnSegmentResult, Vec2 } from "@/core/types.js";
+import { ClusterSettings, Vec2 } from "@/core/types.js";
 import { SimpleOctavesNoise } from "@/noise/SimpleOctaveNoise.js";
 import { ThresholdOctaveNoise } from "@/noise/ThresholdOctavesNoise.js";
+
+interface ClosestPointOnSegmentResult {
+  alongCoord: number;
+  fracAlong: number;
+  lineSegmentLength: number;
+}
 
 const shiftBits = Math.log2(ChunkSize) | 0;
 
@@ -45,7 +51,11 @@ export function getDistance(point: Vec2, x: number, y: number): number {
 }
 
 //kI
-export function getClosestPointOnSegment(point: Vec2, segmentStart: Vec2, segmentEnd: Vec2): ClosestPointOnSegmentResult {
+export function getClosestPointOnSegment(
+  point: Vec2, 
+  segmentStart: Vec2, 
+  segmentEnd: Vec2
+): ClosestPointOnSegmentResult {
   const segmentLengthSquared = squaredDistance(segmentStart, segmentEnd);
 
   const projection =
@@ -106,7 +116,7 @@ export function normalizeVector2(vector: Vec2): void {
 
 //UH
 //型修正必要
-export function getTotalAmplitude(noiseGenerator: SimpleOctavesNoise | ThresholdOctaveNoise ): number {
+export function getTotalAmplitude(noiseGenerator: SimpleOctavesNoise ): number {
   let totalAmplitude = 0;
 
   for (const { amplitude } of noiseGenerator.customOctaves) totalAmplitude += amplitude;
@@ -114,18 +124,14 @@ export function getTotalAmplitude(noiseGenerator: SimpleOctavesNoise | Threshold
 }
 
 //修正必要
-export function interpolateClusterValue(clusterSettings: any, y: number) {
-  const {
-    mE: minValue,
-    ZI: maxValue,
-    shallowClusterY,
-    deepClusterY
-  } = clusterSettings;
+//me = min
+//zi = max
+export function interpolateClusterValue(clusterSettings: ClusterSettings, y: number) {
+  const { minY, maxY, shallowClusterY, deepClusterY } = clusterSettings;
 
-  if (maxValue === undefined || shallowClusterY === undefined || deepClusterY === undefined) {
-    return minValue;
+  if (maxY === undefined || shallowClusterY === undefined || deepClusterY === undefined) {
+    return minY;
   }
 
-  return minValue + (maxValue - minValue) *
-    Math.max(0, Math.min(1, (shallowClusterY - y) / (shallowClusterY - deepClusterY)));
+  return minY + (maxY - minY) * Math.max(0, Math.min(1, (shallowClusterY - y) / (shallowClusterY - deepClusterY)));
 }

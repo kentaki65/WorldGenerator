@@ -1,13 +1,24 @@
 import { CaveField, OUT_OF_RUNGE_NUMBER } from "@/core/constants.js";
-import { CaveInterval } from "@/core/types.js";
+import { BlockMetadata, BlockName, CaveInterval, ClusterSettings, Vec3 } from "@/core/types.js";
 import { CaveDataProvider } from "./CaveDataProvider.js";
 
-const down = [0, -1, 0];
-const up = [0, 1, 0];
-const west = [-1, 0, 0];
-const east = [1, 0, 0];
-const north = [0, 0, -1];
-const south = [0, 0, 1];
+interface BlockOffsetOptions {
+  includeDown: boolean;
+  includeSides: boolean;
+  includeUp: boolean;
+}
+
+interface BlockOffset {
+  offset: Vec3;
+  blockId: number;
+}
+
+const down: Vec3 = [0, -1, 0];
+const up: Vec3 = [0, 1, 0];
+const west: Vec3 = [-1, 0, 0];
+const east: Vec3 = [1, 0, 0];
+const north: Vec3 = [0, 0, -1];
+const south: Vec3 = [0, 0, 1];
 
 //xI
 export function mergeCaveIntervals(
@@ -90,45 +101,44 @@ export function getCaveIntervals(
 }
 
 export function getBlockOffsets(
-  blockMetadata: any,
-  blockName: string,
-  options: any
-) {
-  const result = [];
+  blockMetadata: BlockMetadata,
+  blockName: BlockName,
+  options: BlockOffsetOptions
+): BlockOffset[] {
+  const result: BlockOffset[] = [];
 
-  if (options.qI) {
+  if (options.includeDown) {
     result.push({
       offset: down,
-      NI: blockMetadata[blockName].id
+      blockId: blockMetadata[blockName].id
     });
   }
 
-  if (options.LI) {
+  if (options.includeSides) {
     result.push(
       {
         offset: west,
-        NI: blockMetadata[`${blockName}|meta|rot2|side`].id
+        blockId: blockMetadata[`${blockName}|meta|rot2|side`].id
       },
       {
         offset: east,
-        NI: blockMetadata[`${blockName}|meta|rot4|side`].id
+        blockId: blockMetadata[`${blockName}|meta|rot4|side`].id
       },
       {
         offset: north,
-        NI: blockMetadata[`${blockName}|meta|rot1|side`].id
+        blockId: blockMetadata[`${blockName}|meta|rot1|side`].id
       },
       {
         offset: south,
-        NI: blockMetadata[`${blockName}|meta|rot3|side`].id
+        blockId: blockMetadata[`${blockName}|meta|rot3|side`].id
       }
     );
   }
 
-  //修正必要
-  if (options.gI) {
+  if (options.includeUp) {
     result.push({
       offset: up,
-      NI: blockMetadata[`${blockName}|meta|rot1|top`].id
+      blockId: blockMetadata[`${blockName}|meta|rot1|top`].id
     });
   }
 
@@ -138,17 +148,17 @@ export function getBlockOffsets(
 //修正必要
 
 export function createClusterSettings(
-  blockMetadata: any,
-  clusterConfigs: any[] | null
+  blockMetadata: BlockMetadata,
+  clusterConfigs: ClusterSettings[] | null
 ) {
   if (clusterConfigs === null) {
     return [
       {
         seedPrefix: "crystal",
         anchorOptions: getBlockOffsets(blockMetadata, "Crystal", {
-          qI: true,
-          LI: true,
-          gI: true
+          includeDown: true,
+          includeSides: true,
+          includeUp: true
         }),
         clusterBoxSize: 4,
         yI: 0.8,
@@ -161,9 +171,9 @@ export function createClusterSettings(
       {
         seedPrefix: "mushroom",
         anchorOptions: getBlockOffsets(blockMetadata, "Glowing Mushroom", {
-          qI: true,
-          LI: true,
-          gI: false
+          includeDown: true,
+          includeSides: true,
+          includeUp: false
         }),
         clusterBoxSize: 4,
         yI: 0.7,
@@ -179,9 +189,9 @@ export function createClusterSettings(
     return {
       seedPrefix: clusterConfig.blockName,
       anchorOptions: getBlockOffsets(blockMetadata, clusterConfig.blockName, {
-        qI: clusterConfig.qI,
-        LI: clusterConfig.LI,
-        gI: clusterConfig.gI
+        includeDown: clusterConfig.qI,
+        includeSides: clusterConfig.LI,
+        includeUp: clusterConfig.gI
       }),
       clusterBoxSize: 4,
       yI: clusterConfig.yI,

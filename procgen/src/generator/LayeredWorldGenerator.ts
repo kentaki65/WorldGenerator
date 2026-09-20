@@ -1,3 +1,4 @@
+import { BlockMetadata } from "@/core/types.js";
 import { WorldGenerator } from "./WorldGenerator.js";
 
 interface WorldGenLayer {
@@ -13,7 +14,7 @@ export class LayeredWorldGenerator {
 
   constructor(
     chunkSize: number,
-    blockMetadata: any,
+    blockMetadata: BlockMetadata,
     itemMetadata: any,
     seed: string,
     useBiggerCache: boolean,

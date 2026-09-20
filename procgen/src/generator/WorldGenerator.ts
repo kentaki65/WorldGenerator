@@ -2,7 +2,7 @@ import voxelCrunch from 'voxel-crunch';
 import MD5 from "md5.js";
 
 import { BiomeSelector } from "@/biome/BiomeSelector.js";
-import { Seed, Vec2 } from "@/core/types.js";
+import { BlockMetadata, Seed, Vec2 } from "@/core/types.js";
 import { PartitionedTTLCache } from "@/data/cache/PartitionedTTLCache.js";
 import { CaveDecorationGenerator } from "@/structures/cave/CaveDecorationGenerator.js";
 import { CaveGenerator } from "@/structures/cave/CaveGenerator.js";
@@ -66,7 +66,7 @@ export class WorldGenerator {
 
   constructor(
     chunkSize: number,
-    blockMetadata: any,
+    blockMetadata: BlockMetadata,
     itemMetadata: any,
     seed: Seed,
     useBiggerCache: boolean,
@@ -103,8 +103,9 @@ export class WorldGenerator {
     );
 
     const oreGenerator = new OreGenerator(blockMetadata, seed, chunkSize, options?.MI ?? dE);
+    
     const biomeOptions = {
-      chunkSize: chunkSize,
+      chunkSize,
       blockMetadata,
       worldGenerator: this,
       seed,
@@ -141,8 +142,8 @@ export class WorldGenerator {
           ...createStoneFrequencyData(stoneTypes)
         };
       });
-    }(customBiomes, biomeOptions) : function (HH) {
-      let { chunkSize, blockMetadata, worldGenerator, seed, biomeOpts } = HH;
+    }(customBiomes, biomeOptions) : function (biomeOptions) {
+      let { chunkSize, blockMetadata, worldGenerator, seed, biomeOpts } = biomeOptions;
 
       const desertBiome = new Desert(chunkSize, blockMetadata, worldGenerator, seed, biomeOpts);
       const cactusDesertBiome = new CactusDesert(chunkSize, blockMetadata, worldGenerator, seed, biomeOpts);

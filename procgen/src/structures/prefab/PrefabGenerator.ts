@@ -13,7 +13,7 @@ import { prefabToWorldX, prefabToWorldZ, worldToPrefabX, worldToPrefabZ } from "
 import { CaveManager } from "../cave/CaveManager.js";
 import { FixedPointPrefabManager } from "./FixedPointPrefabManager.js";
 import { collectCaveIntervals } from "../cave/CaveUtils.js";
-import { isFalsy } from "@/utils/utils.js";
+import { isNullOrUndefined } from "@/utils/utils.js";
 import { divideByChunkSize } from "@/utils/MathHelper.js";
 import voxelCrunch from 'voxel-crunch';
 import { LootChestBlockGenerator } from "../lootChest/LootChestBlockGenerator.js";
@@ -454,7 +454,7 @@ export class PrefabGenerator {
   ) {
     const schematicName = prefab.schematic.name;
     const cached = PrefabGenerator.DECODED_PREFAB_SCHEMATIC_CACHE.get(schematicName);
-    if (!isFalsy(cached)) {
+    if (!isNullOrUndefined(cached)) {
       return cached;
     }
 

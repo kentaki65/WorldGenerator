@@ -1,6 +1,6 @@
 import { CanopyType, TreeType, CanopyBlockPlacement, CanopyShape, CanopyLevel, HeightField, OUT_OF_RUNGE_NUMBER } from "@/core/constants.js";
 import { BlockId } from "@/core/index.js";
-import { ChunkArray, PrefabCenter, Seed, TreePlacement } from "@/core/types.js";
+import { BlockMetadata, ChunkArray, PrefabCenter, Seed, TreePlacement } from "@/core/types.js";
 import { ChunkArray2D } from "@/data/array/ChunkArray2D.js";
 import { PointsGenerator } from "@/generator/PointsGenerator.js";
 import { CaveManager } from "../cave/CaveManager.js";
@@ -69,7 +69,7 @@ export class TreeGenerator {
 
   chunkSize: number;
   seed: Seed;
-  blockMetadata: any;
+  blockMetadata: BlockMetadata;
   maxTreeRadius: number;
   treePointGen: PointsGenerator;
   minTreeHeight: number;
@@ -98,7 +98,7 @@ export class TreeGenerator {
     biomeAccessor: BiomeAccessor,
     chunkSize: number,
     seed: Seed,
-    blockMetadata: any
+    blockMetadata: BlockMetadata
   ) {
 
     this.chunkSize = chunkSize;

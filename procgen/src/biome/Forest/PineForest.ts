@@ -1,14 +1,15 @@
-import { BiomeConstructorOptions, Seed } from "@/core/types.js";
+import { BiomeConstructorOptions, BlockMetadata, Seed } from "@/core/types.js";
 import { Forest } from "./Forest.js";
 import { createPrefabFrequencySettings } from "../biomeUtils.js";
 import { FeatureHeight } from "@/core/constants.js";
 import { forestPrefabsFrequencies } from "@/structures/prefab/prefabDatas/prefabFrequencies.js";
+import { WorldGenerator } from "@/generator/WorldGenerator.js";
 
 export class PineForest extends Forest {
   constructor(
     chunkSize: number,
-    blockMetadata: any,
-    worldGenerator: any,
+    blockMetadata: BlockMetadata,
+    worldGenerator: WorldGenerator,
     seed: Seed,
     options: BiomeConstructorOptions,
     surfacePrefabDensitySetting = createPrefabFrequencySettings(

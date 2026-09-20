@@ -1,4 +1,4 @@
-import { BlockId, Seed, CaveHeightThreshold, Range, Vec2, BlockName } from "@/core/types.js";
+import { BlockId, Seed, CaveHeightThreshold, Range, Vec2, BlockName, BlockMetadata } from "@/core/types.js";
 import { PartitionedTTLCache } from "@/data/cache/PartitionedTTLCache.js";
 import { PartitionTTLCache } from "@/data/cache/PartitionTTLCache.js";
 import { FeaturePointGenerator } from "@/generator/FeaturePointGenerator.js";
@@ -8,7 +8,7 @@ import { ThresholdOctaveNoise } from "@/noise/ThresholdOctavesNoise.js";
 import { RandomIntRange } from "@/random/RandomIntRange.js";
 import { RandomRange } from "@/random/RandomRange.js";
 import { WeightedDistribution } from "@/random/WeightedDistribution.js";
-import { getBlockId, isFalsy } from "@/utils/utils.js";
+import { getBlockId, isNullOrUndefined } from "@/utils/utils.js";
 import { CaveGenerator } from "./CaveGenerator.js";
 import { multiplyByChunkSize, normalizeVector2 } from "@/utils/MathHelper.js";
 import { SeededRandom } from "@/noise/SeededRandom.js";
@@ -63,7 +63,7 @@ export class CaveMetadataManager {
   constructor(
     seed: Seed,
     chunkSize: number,
-    blockMetadata: any,
+    blockMetadata: BlockMetadata,
     blockName: BlockName
   ) {
     this.seed = seed;
@@ -194,7 +194,7 @@ export class CaveMetadataManager {
         = function (
           seed: Seed,
           chunkSize: number,
-          blockMetadata: any,
+          blockMetadata: BlockMetadata,
           blockName: BlockName,
           startCaveType: number,
           caveTypeToBlockId: CaveTypeBlockId[],
@@ -518,7 +518,7 @@ export class CaveMetadataManager {
   getOrBuildCaveMetadataForChunk(chunkX: number, chunkZ: number) {
     const cacheKey = `${chunkX}|${chunkZ}`;
     const cached = this.perChunkCache.get(cacheKey);
-    if (!isFalsy(cached)) {
+    if (!isNullOrUndefined(cached)) {
       return cached;
     }
 

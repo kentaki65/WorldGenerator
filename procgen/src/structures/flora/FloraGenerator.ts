@@ -1,5 +1,5 @@
 import { BlockId } from "@/core/index.js";
-import { ChunkArray, Seed } from "@/core/types.js";
+import { BlockMetadata, ChunkArray, Seed } from "@/core/types.js";
 import { PointsGenerator } from "@/generator/PointsGenerator.js";
 import { SeededRandom } from "@/noise/SeededRandom.js";
 import { manhattanDistance } from "@/utils/MathHelper.js";
@@ -52,7 +52,7 @@ interface FlowerSettings {
   flowerPatchDistApart: number | null;
 }
 export class FloraGenerator {
-  blockMetadata: any;
+  blockMetadata: BlockMetadata;
   chunkSize: number;
   seed: Seed;
   grassChance: number;
@@ -87,7 +87,7 @@ export class FloraGenerator {
   fatCactusId: BlockId;
 
   constructor(
-    blockMetadata: any,
+    blockMetadata: BlockMetadata,
     chunkSize: number,
     seed: Seed,
     grassChance: number,

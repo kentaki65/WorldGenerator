@@ -1,5 +1,6 @@
 import { _TypeOf } from "@/core/index.js";
 import { FrequenciesItems, LootItem } from "@/core/types.js";
+import { SeededRandom } from "@/noise/SeededRandom.js";
 import { Probability } from "@/random/Probability.js";
 import { RandomIntRange } from "@/random/RandomIntRange.js";
 import { WeightedDistribution } from "@/random/WeightedDistribution.js";
@@ -59,7 +60,7 @@ export class LootChestGenerator {
     }
   }
 
-  sample(random: any): any[] {
+  sample(random: SeededRandom): any[] {
     const items = Array<any | null>(36).fill(null);
     let itemIndex = 0;
 
@@ -98,7 +99,7 @@ export class LootChestGenerator {
   }
 
   getEnchantmentAttributesForItem(
-    random: any,
+    random: SeededRandom,
     itemName: string
   ) {
     if (!this.shouldEnchantDistribution.sample(random)) {

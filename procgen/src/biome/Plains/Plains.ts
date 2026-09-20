@@ -1,15 +1,16 @@
 import { SimpleOctavesNoise } from "@/noise/SimpleOctaveNoise.js";
 import { Biome } from "../Biome.js";
 import { BiomeRegion, FeatureHeight } from "@/core/constants.js";
-import { BiomeConstructorOptions, Seed } from "@/core/types.js";
+import { BiomeConstructorOptions, BlockMetadata, Seed } from "@/core/types.js";
 import { createPrefabFrequencySettings } from "../biomeUtils.js";
 import { mapleTreePrefabFrequencies, ruinStonePrefabFrequencies } from "@/structures/prefab/prefabDatas/prefabFrequencies.js";
+import { WorldGenerator } from "@/generator/WorldGenerator.js";
 
 export class Plains extends Biome {
   constructor(
     chunkSize: number,
-    blockMetadata: any,
-    worldGenerator: any,
+    blockMetadata: BlockMetadata,
+    worldGenerator: WorldGenerator,
     seed: Seed,
     options: BiomeConstructorOptions,
     surfacePrefabDensitySetting = createPrefabFrequencySettings(FeatureHeight.MEDIUM, ruinStonePrefabFrequencies, mapleTreePrefabFrequencies)

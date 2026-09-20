@@ -1,7 +1,7 @@
-import { Vec3, Vec3Object } from "@/core/types.js";
+import { Vec3Object } from "@/core/types.js";
 import { RLEChunkContainer } from "./RLEChunkContainer.js";
 import { Sparse3DMap } from "@/data/array/Sparse3DMap.js";
-import { isFalsy } from "@/utils/utils.js";
+import { isNullOrUndefined } from "@/utils/utils.js";
 
 export function buildSchematic(
   name: string,
@@ -13,10 +13,10 @@ export function buildSchematic(
     rle: Uint8Array;
   }>
 ): RLEChunkContainer {
-  const rleChunkStorage = new Sparse3DMap<unknown>();
+  const rleChunkStorage = new Sparse3DMap<Uint8Array>();
 
   for (const chunk of chunks) {
-    if (!isFalsy(rleChunkStorage.get(chunk.chunkX, chunk.chunkY, chunk.chunkZ))) {
+    if (!isNullOrUndefined(rleChunkStorage.get(chunk.chunkX, chunk.chunkY, chunk.chunkZ))) {
       throw new Error(`Duplicate chunk at ${chunk.chunkX}, ${chunk.chunkY}, ${chunk.chunkZ}`);
     }
 
@@ -30,11 +30,7 @@ export function buildSchematic(
 
   return new RLEChunkContainer(
     name,
-    {
-      x: 0,
-      y: 0,
-      z: 0
-    },
+    { x: 0, y: 0, z: 0 },
     dimensions,
     rleChunkStorage
   );

@@ -3,7 +3,7 @@ import { PartitionedTTLCache } from "@/data/cache/PartitionedTTLCache.js";
 import { SeededRandom } from "@/noise/SeededRandom.js";
 import { SimpleOctavesNoise } from "@/noise/SimpleOctaveNoise.js";
 import { getClosestPointOnSegment, getDistance, getTotalAmplitude } from "@/utils/MathHelper.js";
-import { isFalsy } from "@/utils/utils.js";
+import { isNullOrUndefined } from "@/utils/utils.js";
 
 let waterBodyCachePool = null;
 
@@ -305,7 +305,7 @@ export class WaterBodyGenerator {
     }
 
     const cachedInfo = this.waterBodyInfos.get(cellKey);
-    if (!isFalsy(cachedInfo)) {
+    if (!isNullOrUndefined(cachedInfo)) {
       this.lastReadInfo.lastId = cellKey;
       this.lastReadInfo.info = cachedInfo;
       return cachedInfo;

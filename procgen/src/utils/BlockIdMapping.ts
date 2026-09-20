@@ -1,9 +1,11 @@
+import { BlockMetadata } from "@/core/types.js";
+
 const ROTATIONS = [0, 90, 180, 270];
 
 export class BlockIdMappingManager {
   blockIdMappings: Record<string, Uint16Array>;
 
-  constructor(blockMetadata: any) {
+  constructor(blockMetadata: BlockMetadata) {
     this.blockIdMappings = {};
 
     const blockIds = new Set(
@@ -36,7 +38,7 @@ export class BlockIdMappingManager {
   }
 
   createBlockIdMapping(
-    blockMetadata: any,
+    blockMetadata: BlockMetadata,
     maxBlockId: number,
     rotation: number,
     mirror: boolean

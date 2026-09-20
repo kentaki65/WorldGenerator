@@ -1,12 +1,13 @@
 import { SimpleOctavesNoise } from "@/noise/SimpleOctaveNoise.js";
 import { Biome } from "../Biome.js";
-import { BiomeConstructorOptions, Seed } from "@/core/types.js";
+import { BiomeConstructorOptions, BlockMetadata, Seed } from "@/core/types.js";
+import { WorldGenerator } from "@/generator/WorldGenerator.js";
 
 export class RollingHills extends Biome {
   constructor(
     chunkSize: number, 
-    blockMetadata: any, 
-    worldGenerator: any, 
+    blockMetadata: BlockMetadata, 
+    worldGenerator: WorldGenerator, 
     seed: Seed, 
     options: BiomeConstructorOptions
   ) {

@@ -1,4 +1,4 @@
-import { Seed, Vec2 } from "@/core/types.js";
+import { BlockMetadata, Seed, Vec2 } from "@/core/types.js";
 import { OreGenerator } from "@/structures/ore/oreGenerator.js";
 import { Biome } from "./Biome.js";
 import { PointsGenerator } from "@/generator/PointsGenerator.js";
@@ -25,7 +25,7 @@ export class BiomeSelector {
   biomeEntries: BiomeEntry[];
   biomeFrequencies: number[];
   seed: Seed;
-  blockMetadata: any;
+  blockMetadata: BlockMetadata;
   chunkSize: number;
   mostRecentlyAccessedPtForBiome: Vec2;
   mostRecentlyAccessedBiome: {
@@ -40,7 +40,7 @@ export class BiomeSelector {
     itemMetadata: any,
     seed: Seed,
     chunkSize: number,
-    blockMetadata: any,
+    blockMetadata: BlockMetadata,
     biomeEntries: BiomeEntry[]
   ) {
     this.mostRecentlyAccessedPtForBiome = [0, 0];

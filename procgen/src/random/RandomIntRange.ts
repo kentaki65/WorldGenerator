@@ -1,3 +1,4 @@
+import { SeededRandom } from "@/noise/SeededRandom.js";
 import { RandomRange } from "./RandomRange.js";
 
 export class RandomIntRange {
@@ -11,7 +12,7 @@ export class RandomIntRange {
     }
   }
 
-  sample(random: any): number {
+  sample(random: SeededRandom): number {
     const value = this.uniformRealDistribution.sample(random);
     return Math.floor(value);
   }
