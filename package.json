@@ -15,8 +15,7 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsc && tsc-alias"
+
   },
   "dependencies": {
     "@isaacs/ttlcache": "2.1.5",
@@ -28,6 +27,7 @@
   },
   "devDependencies": {
     "@types/ndarray": "1.1.0",
+    "@types/node": "^26.6.2",
     "@types/poisson-disk-sampling": "^2.2.4",
     "tsc-alias": "^1.9.5",
     "typescript": "5.9"

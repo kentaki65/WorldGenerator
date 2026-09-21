@@ -49,28 +49,62 @@ export class CaveManager {
     groundHeightmap: any,
     caveData: InnerChunkCaveDataView,
   ) {
-    const random = new SeededRandom(`caveBlocks${chunkX}|${minY}|${chunkZ}`);
+    const random = new SeededRandom(
+      `caveBlocks${chunkX}|${minY}|${chunkZ}`
+    );
 
-    for (let x = chunkX; x < chunkX + groundHeightmap.chunkSize; x++) {
-      for (let z = minY; z < minY + groundHeightmap.chunkSize; z++) {
-        const groundHeight = groundHeightmap.get(x, z, HeightField.GroundHeight);
+    for (let x = chunkX; x < chunkX + caveData.chunkSize; x++) {
+      for (let z = chunkZ; z < chunkZ + caveData.chunkSize; z++) {
+        const groundHeight = groundHeightmap.get(
+          x,
+          z,
+          HeightField.GroundHeight
+        );
 
-        for (const caveType of groundHeightmap.caveTypePrioritization) {
-          const floorY = groundHeightmap.getOrGenerate(x, z, caveType, CaveField.FloorY);
+        for (const caveType of caveData.caveTypePrioritization) {
+          const floorY = caveData.getOrGenerate(
+            x,
+            z,
+            caveType,
+            CaveField.FloorY
+          );
           if (floorY === OUT_OF_RUNGE_NUMBER.NO_CAVE_NUMBER) {
             continue;
           }
-          const ceilingY = groundHeightmap.getOrGenerate(x, z, caveType, CaveField.CeilingY);
-          const maxY = Math.min(ceilingY + 1, minY + groundHeightmap.chunkSize, groundHeight + 1);
-          const blockIds = groundHeightmap.caveTypeToBlockIds[caveType];
+          const ceilingY = caveData.getOrGenerate(
+            x,
+            z,
+            caveType,
+            CaveField.CeilingY
+          );
+
+          const maxY = Math.min(
+            ceilingY + 1,
+            minY + caveData.chunkSize,
+            groundHeight + 1
+          );
+
+          const blockIds = caveData.caveTypeToBlockIds[caveType];
+
+          console.log(
+            "CAVE:",
+            "chunkY =", minY,
+            "ground =", groundHeight,
+            "floor =", floorY,
+            "ceiling =", ceilingY,
+            "maxY =", maxY
+          );
 
           for (let y = Math.max(floorY, minY); y < maxY; y++) {
-            const blockId = typeof blockIds === "number" ? blockIds : blockIds.sample(random);
+            const blockId =
+              typeof blockIds === "number"
+                ? blockIds
+                : blockIds.sample(random);
 
             chunkArray.set(
               x - chunkX,
               y - minY,
-              z - minY,
+              z - chunkZ,
               blockId
             );
           }
@@ -79,9 +113,10 @@ export class CaveManager {
     }
   }
 
+
   getCaveHeightmapVals(
-    x: number, 
-    z: number, 
+    x: number,
+    z: number,
     heightmapVals: ChunkDataCache3D
   ) {
     const chunkCoord: Vec2 = [x, z];
