@@ -12,7 +12,7 @@ import { CaveDataView, InnerChunkCaveDataView } from "@/structures/cave/CaveData
 import { DecodedFixedPointPrefabInfo, FixedPointPrefabManager } from "@/structures/prefab/FixedPointPrefabManager.js";
 import { BlockMetadata, GeneratedPrefabPlacement, PrefabInstance, Seed, TreePlacement } from "@/core/types.js";
 import { SeededRandom } from "@/noise/SeededRandom.js";
-import { squaredDistanceToPoint } from "@/utils/MathHelper.js";
+import { squaredDistanceToPoint } from "@/utils/mathHelper.js";
 import { LootChestBlockGenerator } from "@/structures/lootChest/LootChestBlockGenerator.js";
 import { ChunkDataCache3D } from "@/data/cache/ChunkDataCache3D.js";
 import { CombinedArray3D } from "@/data/array/CombinedArray3D.js";
@@ -97,7 +97,7 @@ export class ChunkGenerator {
     treeData: TreePlacement[],
     prefabData: GeneratedPrefabPlacement[],
     caveData: InnerChunkCaveDataView,
-    oreData: number[],
+    oreData:  Int32Array,
     biomeInfo: BiomeInfo,
     fixedPrefabInfo: ChunkDataCache3D | null,
     fixedPrefabs: DecodedFixedPointPrefabInfo[],

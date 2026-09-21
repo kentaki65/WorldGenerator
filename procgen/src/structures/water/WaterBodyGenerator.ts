@@ -5,7 +5,7 @@ import { PartitionTTLCache } from "@/data/cache/PartitionTTLCache.js";
 import { NoWaterHeightmap } from "@/generator/NoWaterHeightmap.js";
 import { SeededRandom } from "@/noise/SeededRandom.js";
 import { SimpleOctavesNoise } from "@/noise/SimpleOctaveNoise.js";
-import { getClosestPointOnSegment, getDistance, getTotalAmplitude } from "@/utils/MathHelper.js";
+import { getClosestPointOnSegment, getDistance, getTotalAmplitude } from "@/utils/mathHelper.js";
 import { isNullOrUndefined } from "@/utils/utils.js";
 
 let waterBodyCachePool = null;

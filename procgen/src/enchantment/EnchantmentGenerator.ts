@@ -37,6 +37,20 @@ const tierLevel = {
 
 type EnchantmentTier = keyof typeof tierLevel;
 
+export let EE: EnchantmentGenerator | undefined;
+
+export function initializeEnchantmentGenerator(itemMetadata: any) {
+  EE ||= new EnchantmentGenerator(itemMetadata);
+}
+
+export function getEnchantmentGenerator(): EnchantmentGenerator {
+  if (EE === undefined) {
+    throw new Error("EnchantmentGenerator has not been initialized.");
+  }
+
+  return EE;
+}
+
 export class EnchantmentGenerator {
   suffixMapping: Record<string, string>;
 

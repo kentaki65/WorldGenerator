@@ -2,11 +2,11 @@ import { HeightField } from "@/core/constants.js";
 import { BlockId, BlockMetadata, BlockName, ChunkArray, Seed } from "@/core/types.js";
 import { PointsGenerator } from "@/generator/PointsGenerator.js";
 import { SeededRandom } from "@/noise/SeededRandom.js";
-import { manhattanDistance } from "@/utils/MathHelper.js";
+import { manhattanDistance } from "@/utils/mathHelper.js";
 import { getBlockId } from "@/utils/utils.js";
 
-interface OreConfig {
-  blockName: string;
+export interface OreConfig {
+  blockName: BlockName;
   minHeight: number;
   maxHeight: number;
   veinRadius: number;
@@ -145,7 +145,7 @@ export class OreGenerator {
     chunkStartZ: number,
     oreDepthBelowSurface: number,
     heightmapVals: any,
-    oreData: number[]
+    oreData: Int32Array
   ) {
     const chunkEndY = chunkStartY + this.chunkSize;
     const oreDataLength = oreData.length;

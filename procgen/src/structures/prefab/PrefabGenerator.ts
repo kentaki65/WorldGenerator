@@ -1,7 +1,7 @@
 import { BlockPlacementMode, CaveMobs, ChunkSize, HeightField, OUT_OF_RUNGE_NUMBER, Rarity } from "@/core/constants.js";
 import { BlockId, CaveInterval, CaveMobNames, GeneratedPrefabPlacement, Prefab, PrefabCenter, PrefabConfig, PrefabInstance, PrefabPlacement, Seed, Vec2 } from "@/core/types.js";
 import { Sparse3DMap } from "@/data/array/Sparse3DMap.js";
-import { EnchantmentGenerator } from "@/enchantment/EnchantmentGenerator.js";
+import { EE, EnchantmentGenerator, initializeEnchantmentGenerator } from "@/enchantment/EnchantmentGenerator.js";
 import { PointsGenerator } from "@/generator/PointsGenerator.js";
 import { SeededRandom } from "@/noise/SeededRandom.js";
 import { BidirectionalMap } from "@/utils/BidirectionalMap.js";
@@ -14,7 +14,7 @@ import { CaveManager } from "../cave/CaveManager.js";
 import { FixedPointPrefabManager } from "./FixedPointPrefabManager.js";
 import { collectCaveIntervals } from "../cave/CaveUtils.js";
 import { isNullOrUndefined } from "@/utils/utils.js";
-import { divideByChunkSize } from "@/utils/MathHelper.js";
+import { divideByChunkSize } from "@/utils/mathHelper.js";
 import voxelCrunch from 'voxel-crunch';
 import { LootChestBlockGenerator } from "../lootChest/LootChestBlockGenerator.js";
 import { ChunkDataCache3D } from "@/data/cache/ChunkDataCache3D.js";
@@ -48,7 +48,7 @@ export class PrefabGenerator {
     const { seed, chunkSize, blockMetadata, itemMetadata, prefabSize, typeSettings } = options;
 
     PrefabGenerator.BLOCK_ID_MAPPINGS ||= new BlockIdMappingManager(blockMetadata);
-    EE ||= new EnchantmentGenerator(itemMetadata);
+    initializeEnchantmentGenerator(itemMetadata);
 
     this.seed = seed;
     this.chunkSize = chunkSize;
@@ -123,7 +123,7 @@ export class PrefabGenerator {
     heightmapVals: ChunkDataCache3D,
     biomeGrid: ChunkGeneratorCache,
     caveData: CaveDataView,
-    fixedPrefabInfo: ChunkDataCache3D
+    fixedPrefabInfo: ChunkDataCache3D | null
   ) {
     const prefabsForChunk = [];
     const halfChunkSize = this.chunkSize >> 1;
@@ -217,7 +217,7 @@ export class PrefabGenerator {
             const x = prefabToWorldX(placement, spawnerLocation.localX, spawnerLocation.localZ);
             const z = prefabToWorldZ(placement, spawnerLocation.localX, spawnerLocation.localZ);
             const y = anchorY + spawnerLocation.localY;
-            const mobType: CaveMobNames = spawnerLocation.mobTypeDistribution.sample(rng);
+            const mobType = spawnerLocation.mobTypeDistribution.sample(rng);
             const spawnerBlockId = this.mobTypeToSpawnerBlockId[mobType];
             spawnerBlockLocationToBlockId.set(x, y, z, spawnerBlockId);
           }
@@ -249,7 +249,7 @@ export class PrefabGenerator {
     rng: SeededRandom,
     heightmapVals: ChunkDataCache3D,
     caveData: CaveDataView,
-    fixedPrefabInfo: ChunkDataCache3D
+    fixedPrefabInfo: ChunkDataCache3D | null
   ) {
     const prefab = placement.prefab;
     const centreX = placement.centreX;
@@ -297,7 +297,7 @@ export class PrefabGenerator {
     groundingRadius: number,
     heightmapVals: ChunkDataCache3D,
     caveData: CaveDataView,
-    fixedPrefabInfo: ChunkDataCache3D
+    fixedPrefabInfo: ChunkDataCache3D | null
   ) {
     let minGroundHeight = 10000;
 

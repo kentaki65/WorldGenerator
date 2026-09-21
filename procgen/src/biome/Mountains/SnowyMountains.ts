@@ -1,6 +1,6 @@
 import { SimpleOctavesNoise } from "@/noise/SimpleOctaveNoise.js";
 import { Biome } from "../Biome.js";
-import { getTotalAmplitude } from "@/utils/MathHelper.js";
+import { getTotalAmplitude } from "@/utils/mathHelper.js";
 import { BiomeConstructorOptions, BlockMetadata, Seed } from "@/core/types.js";
 import { WorldGenerator } from "@/generator/WorldGenerator.js";
 

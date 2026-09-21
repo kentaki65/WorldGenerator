@@ -6,7 +6,7 @@
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
     "resolveJsonModule": true,
-    
+
     "strict": true,
     "forceConsistentCasingInFileNames": true,
     "noImplicitAny": true,
@@ -15,13 +15,13 @@
     "skipLibCheck": true,
 
     "baseUrl": ".",
-    "ignoreDeprecations": "6.0",
-    
+
     "paths": {
       "@/*": ["src/*"]
     },
 
-    "noEmit": true
+    "outDir": "./dist",
+    "rootDir": "./src"
   },
 
   "include": ["src/**/*"],

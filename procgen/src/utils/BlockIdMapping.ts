@@ -61,23 +61,23 @@ export class BlockIdMappingManager {
     }
 
     //metaが必要!!!!
-    for (const blockName in blockMetadata) {
+    for (const blockName of Object.keys(blockMetadata) as BlockName[]) {
       const { id: blockId, meta } = blockMetadata[blockName];
-      const { rot: metaRotation, rootName, metaStr } = meta;
+      const { rot, rootName, metaStr } = meta;
 
       let mappedBlockId: number;
 
-      if (metaRotation === null) {
+      if (rot === null) {
         mappedBlockId = blockId;
       } else {
-        const mappedRotation = rotationMapping[metaRotation - 1]! + 1;
+        const mappedRotation = rotationMapping[rot - 1]! + 1;
 
         const mappedMetaStr = metaStr.replace(
-          `rot${metaRotation}`,
+          `rot${rot}`,
           `rot${mappedRotation}`
         );
 
-        const mappedName = `${rootName}|${mappedMetaStr}`;
+        const mappedName = `${rootName}|${mappedMetaStr}` as BlockName;
 
         mappedBlockId = blockMetadata[mappedName]?.id ?? null;
 

@@ -1,12 +1,7 @@
-import { Seed } from "@/core/types.js";
+import { Octave, Seed } from "@/core/types.js";
 import SimplexNoise from "simplex-noise";
 
 //WH
-interface Octave {
-  amplitude: number;
-  frequency: number;
-}
-
 export class SimpleOctavesNoise {
   simplexes: SimplexNoise[];
   customOctaves: Octave[];

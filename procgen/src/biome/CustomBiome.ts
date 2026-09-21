@@ -4,7 +4,7 @@ import { WorldGenerator } from "@/generator/WorldGenerator.js";
 import { getBlockId } from "@/utils/utils.js";
 import { SimpleOctavesNoise } from "@/noise/SimpleOctaveNoise.js";
 
-interface CustomBiomeDefinition {
+export interface CustomBiomeDefinition {
   frequency: number;
 
   topSoilBlockName: BlockName; // surface/topsoil?

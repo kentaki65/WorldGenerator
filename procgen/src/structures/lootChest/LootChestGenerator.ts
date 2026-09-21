@@ -1,5 +1,6 @@
 import { _TypeOf } from "@/core/index.js";
 import { FrequenciesItems, LootItem } from "@/core/types.js";
+import { getEnchantmentGenerator } from "@/enchantment/EnchantmentGenerator.js";
 import { SeededRandom } from "@/noise/SeededRandom.js";
 import { Probability } from "@/random/Probability.js";
 import { RandomIntRange } from "@/random/RandomIntRange.js";
@@ -105,14 +106,14 @@ export class LootChestGenerator {
     if (!this.shouldEnchantDistribution.sample(random)) {
       return null;
     }
-
-    const enchantments = EE.getPossibleEnchantmentsForItem(itemName);
+    const enchantmentGenerator = getEnchantmentGenerator();
+    const enchantments = enchantmentGenerator.getPossibleEnchantmentsForItem(itemName);
 
     if (enchantments.length === 0) {
       return null;
     }
 
-    return EE.chooseRandomEnchantmentAttributes(
+    return enchantmentGenerator.chooseRandomEnchantmentAttributes(
       random,
       this.enchantmentTier,
       enchantments

@@ -1,4 +1,4 @@
-import { BlockId, Seed, CaveHeightThreshold, Range, Vec2, BlockName, BlockMetadata } from "@/core/types.js";
+import { BlockId, Seed, Vec2, BlockName, BlockMetadata } from "@/core/types.js";
 import { PartitionedTTLCache } from "@/data/cache/PartitionedTTLCache.js";
 import { PartitionTTLCache } from "@/data/cache/PartitionTTLCache.js";
 import { FeaturePointGenerator } from "@/generator/FeaturePointGenerator.js";
@@ -10,9 +10,20 @@ import { RandomRange } from "@/random/RandomRange.js";
 import { WeightedDistribution } from "@/random/WeightedDistribution.js";
 import { getBlockId, isNullOrUndefined } from "@/utils/utils.js";
 import { CaveGenerator } from "./CaveGenerator.js";
-import { multiplyByChunkSize, normalizeVector2 } from "@/utils/MathHelper.js";
+import { multiplyByChunkSize, normalizeVector2 } from "@/utils/mathHelper.js";
 import { SeededRandom } from "@/noise/SeededRandom.js";
 import { ChunkDataCache3D } from "@/data/cache/ChunkDataCache3D.js";
+
+type Range = {
+  low: number;
+  high: number;
+};
+
+interface CaveHeightThreshold extends Range {
+  midpoint: number;
+  width: number;
+  halfWidth: number;
+}
 
 export interface SpaghettiCaveMetadata {
   caveType: number;

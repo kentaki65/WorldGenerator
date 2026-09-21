@@ -1,4 +1,4 @@
-{
+export const blockMetadata = {
     "Unloaded": {
         "ttb": 100,
         "textureInfo": "unloaded",

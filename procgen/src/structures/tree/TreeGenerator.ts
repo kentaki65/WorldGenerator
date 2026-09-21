@@ -352,7 +352,7 @@ export class TreeGenerator {
   getTreesForChunk(
     chunkStartX: number,
     chunkStartZ: number,
-    heightmapVals: ChunkDataCache3D,
+    heightmapVals: ChunkDataCache3D | null,
     biomeGrid: ChunkGeneratorCache,
     caveHeightmapVals: CaveDataView,
     placedPrefabs: PrefabCenter[],
@@ -369,7 +369,7 @@ export class TreeGenerator {
           if (!this.treePointGen.isPoint(worldX, worldZ)) {
             continue;
           }
-          if (heightmapVals.getOrGenerate(worldX, worldZ, HeightField.WaterHeight) !== OUT_OF_RUNGE_NUMBER.NO_WATER_VALUE) {
+          if (heightmapVals?.getOrGenerate(worldX, worldZ, HeightField.WaterHeight) !== OUT_OF_RUNGE_NUMBER.NO_WATER_VALUE) {
             continue;
           }
           const groundHeight = heightmapVals.getOrGenerate(worldX, worldZ, HeightField.GroundHeight);

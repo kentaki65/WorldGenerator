@@ -7,14 +7,22 @@ import { FixedPointPrefabChunkHeightGenerator } from "@/structures/prefab/FixedP
 
 //型について修正欲しい
 //zH
+interface ChunkDataGenerator {
+  generateAndSet(
+    x: number,
+    z: number,
+    heightmap: any
+  ): void;
+}
+
 export class ChunkDataCache3D {
   innerContiguousArray: ChunkArray3D;
-  generator: FixedPointPrefabChunkHeightGenerator;
+  generator: ChunkDataGenerator;
   outerSparseArray: Sparse3DArray;
 
   constructor(
     innerContiguousArray: ChunkArray3D,
-    generator: FixedPointPrefabChunkHeightGenerator
+    generator: ChunkDataGenerator
   ) {
     this.innerContiguousArray = innerContiguousArray;
     this.generator = generator;
@@ -25,7 +33,7 @@ export class ChunkDataCache3D {
     size: number,
     chunkBottomLeft: Vec2,
     dimension3: HeightField,
-    generator: FixedPointPrefabChunkHeightGenerator
+    generator: ChunkDataGenerator
   ) {
     const innerArray = new ChunkArray3D(size, chunkBottomLeft, dimension3);
 

@@ -2,7 +2,7 @@ import voxelCrunch from 'voxel-crunch';
 import MD5 from "md5.js";
 
 import { BiomeSelector } from "@/biome/BiomeSelector.js";
-import { BlockId, BlockMetadata, BlockName, GeneratedPrefabPlacement, Seed, TreePlacement, Vec2 } from "@/core/types.js";
+import { BlockMetadata, BlockName, ClusterConfig, GeneratedPrefabPlacement, Seed, TreePlacement, Vec2 } from "@/core/types.js";
 import { PartitionedTTLCache } from "@/data/cache/PartitionedTTLCache.js";
 import { CaveDecorationGenerator } from "@/structures/cave/CaveDecorationGenerator.js";
 import { FixedPointPrefabManager } from "@/structures/prefab/FixedPointPrefabManager.js";
@@ -13,7 +13,7 @@ import { SimpleOctavesNoise } from "@/noise/SimpleOctaveNoise.js";
 import { WaterBodyGenerator } from "@/structures/water/WaterBodyGenerator.js";
 import { ChunkGenerator } from "./ChunkGenerator.js";
 import { PartitionTTLCache } from "@/data/cache/PartitionTTLCache.js";
-import { oreConfigs, OreGenerator } from "@/structures/ore/oreGenerator.js";
+import { OreConfig, oreConfigs, OreGenerator } from "@/structures/ore/oreGenerator.js";
 import { createStoneFrequencyData } from "@/utils/createStoneFrequencyData.js";
 import { getBlockId } from "@/utils/utils.js";
 import { Desert } from "@/biome/Desert/Desert.js";
@@ -41,19 +41,10 @@ import { ChunkGeneratorCache } from '@/data/cache/ChunkGeneratorCache.js';
 import { HeightmapGenerator } from './HeightmapGenerator.js';
 import { ChunkDataCache3D } from '@/data/cache/ChunkDataCache3D.js';
 import { CaveManager } from '@/structures/cave/CaveManager.js';
-import { CustomBiome } from '@/biome/CustomBiome.js';
+import { CustomBiome, CustomBiomeDefinition } from '@/biome/CustomBiome.js';
 import { ChunkArray2D } from '@/data/array/ChunkArray2D.js';
 import { CombinedArray3D } from '@/data/array/CombinedArray3D.js';
 import { InnerChunkCaveDataView } from '@/structures/cave/CaveDataViewer.js';
-
-interface OreConfig {
-  blockName: string;
-  minHeight: number;
-  maxHeight: number;
-  veinRadius: number;
-  placementChance: number;
-  minDistanceBetweenOres: number;
-}
 
 interface ChunkColumInfo {
   biomeInfos: {
@@ -78,13 +69,31 @@ interface ChunkColumInfo {
   caveDecorations: any;
 }
 
+interface GeneratorOptionsTemp {
+  /** 川・湖などの水域生成を有効にするか(デフォルト true) */
+  enableWaterGeneration?: boolean;          // 旧 OI
+
+  /** カスタムバイオーム定義。指定すると標準バイオーム構成を完全に置き換える */
+  biomeEntries?: CustomBiome[] | null;
+
+  /** 鉱石生成設定の上書き(未指定時は oreConfigs を使用) */
+  oreConfigOverrides?: OreConfig[];          // 旧 MI
+
+  cave?: {
+    /** 洞窟ピットの充填ブロック名(デフォルト "Lava") */
+    fillBlockName?: BlockName;               // 旧 WI.UI
+    /** 洞窟内装飾のクラスタ設定(未指定/nullでデフォルト設定を使用) */
+    decorationConfigs?: ClusterConfig[] | null; // 旧 WI.BI
+  };
+}
+
 interface GeneratorOptions {
-  OI: boolean;
-  biomeEntries: any;
-  MI: OreConfig[];
-  WI: {
-    UI?: string;
-    BI?: any;
+  enableWaterGeneration: boolean;
+  biomeEntries: CustomBiomeDefinition[] | null;
+  oreConfigOverrides: OreConfig[];
+  cave: {
+    fillBlockName?: BlockName;
+    decorationConfigs?: ClusterConfig[] | null;
   };
 }
 
@@ -143,14 +152,14 @@ export class WorldGenerator {
       seed,
       chunkSize,
       blockMetadata,
-      options?.WI?.UI as BlockName ?? "Lava"
+      options?.cave?.fillBlockName as BlockName ?? "Lava"
     );
 
     const oreGenerator = new OreGenerator(
       blockMetadata,
       seed,
       chunkSize,
-      options?.MI ?? oreConfigs
+      options?.oreConfigOverrides ?? oreConfigs
     );
 
     const biomeOptions = {
@@ -178,11 +187,15 @@ export class WorldGenerator {
           frequency: entry.frequency
         }));
 
+        const stoneFrequencyData = createStoneFrequencyData(stoneTypes);
+
         return {
           biome: customBiome,
           frequency: customBiomeDef.frequency,
           altBiome: null,
-          ...createStoneFrequencyData(stoneTypes)
+          stoneTypes: stoneFrequencyData.stoneFrequencies,
+          stoneFrequencies: stoneFrequencyData.frequencyValues,
+          stonesTotalFrequency: stoneFrequencyData.stonesTotalFrequency
         };
       });
     }(customBiomes, biomeOptions) : function (biomeOptions) {
@@ -209,18 +222,18 @@ export class WorldGenerator {
       const frozenBadlandsPlainsBiome = new FrozenBadlandsPlains(chunkSize, blockMetadata, worldGenerator, seed, biomeOpts);
       const frozenBadlandsForestBiome = new FrozenBadlandsForest(chunkSize, blockMetadata, worldGenerator, seed, biomeOpts);
 
-      const stoneTypes = createStoneFrequencyData(function (HH) {
+      const stoneTypes = createStoneFrequencyData(function (blockMetadata) {
         return [{
-          stoneId: HH.Stone.id,
+          stoneId: blockMetadata.Stone.id,
           frequency: 100
         }, {
-          stoneId: HH.Andesite.id,
+          stoneId: blockMetadata.Andesite.id,
           frequency: 4
         }, {
-          stoneId: HH.Diorite.id,
+          stoneId: blockMetadata.Diorite.id,
           frequency: 2
         }, {
-          stoneId: HH.Granite.id,
+          stoneId: blockMetadata.Granite.id,
           frequency: 1
         }];
       }(blockMetadata));
@@ -325,7 +338,12 @@ export class WorldGenerator {
         biome: blueForestBiome,
         frequency: 4,
         altBiome: null
-      }].map(HH => ({ ...HH, ...stoneTypes }));
+      }].map(HH => ({
+        ...HH,
+        stoneTypes: stoneTypes.stoneFrequencies,
+        stoneFrequencies: stoneTypes.frequencyValues,
+        stonesTotalFrequency: stoneTypes.stonesTotalFrequency
+      }));
     }(biomeOptions);
 
     this.biomeSelector = new BiomeSelector(this, oreGenerator, seed, chunkSize, blockMetadata, biomeEntries);
@@ -393,15 +411,14 @@ export class WorldGenerator {
       heightmapPerturbAmplitude,
       this.needOutsideWaterDist,
       useBiggerCache,
-      options?.OI ?? true
+      options?.enableWaterGeneration ?? true
     );
 
     this.caveDecorationGenerator = new CaveDecorationGenerator(
       blockMetadata,
       chunkSize,
       seed,
-      //config
-      options?.WI?.BI ?? null
+      options?.cave?.decorationConfigs ?? null
     );
 
     this.chunkGenerator = new ChunkGenerator(

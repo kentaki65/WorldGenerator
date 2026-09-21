@@ -1,5 +1,4 @@
 import { Rarity } from "@/core/constants.js";
-import { _TypeOf } from "@/core/index.js";
 import { lootChestGenerators } from "./lootTables.js";
 import { LootChestGenerator } from "./LootChestGenerator.js";
 import { SeededRandom } from "@/noise/SeededRandom.js";
@@ -54,5 +53,3 @@ export class LootChestBlockGenerator {
     };
   }
 }
-
-console.log(new LootChestBlockGenerator(1, "kentaki", 1, 2, 3, Rarity.LEGENDARY))

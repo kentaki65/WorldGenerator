@@ -5,10 +5,15 @@ import { HeightField } from "@/core/constants.js";
 import { ChunkDataCache3D } from "@/data/cache/ChunkDataCache3D.js";
 import { CaveDataView } from "./CaveDataViewer.js";
 
+interface CaveInterval {
+  floorY: number;
+  ceilingY: number;
+}
+
 export class CaveDataProvider {
   heightmapVals: ChunkDataCache3D;
-  allCavesCache: CoordinateGeneratorCache;
-  decoratableCavesCache: CoordinateGeneratorCache;
+  allCavesCache: CoordinateGeneratorCache<CaveInterval[]>;
+  decoratableCavesCache: CoordinateGeneratorCache<CaveInterval[]>;
 
   constructor(
     heightmapVals: ChunkDataCache3D,
