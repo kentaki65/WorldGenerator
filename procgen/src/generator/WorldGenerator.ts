@@ -452,7 +452,7 @@ export class WorldGenerator {
       const hashInputJson = JSON.stringify(hashInput);
 
       return {
-        hash: new MD5.update(hashInputJson).digest("hex"),
+        hash: new MD5().update(hashInputJson).digest("hex"),
         specialBlocks
       };
     } catch (error: any) {

@@ -38,16 +38,7 @@ export type LootItem = {
 export type BlockId = number;
 export type NumCaveTypes = number;
 
-type _BlockMetadata = _TypeOf["BlockMetadataItem"];
-
-export type BlockMetadata = Record<
-  BlockName,
-  Omit<_BlockMetadata, "meta"> & {
-    meta: Omit<_BlockMetadata["meta"], "rootName"> & {
-      rootName: BlockName;
-    };
-  }
->;
+export type BlockMetadata = typeof blockMetadata;
 
 export interface ChunkArray {
   set(x: number, y: number, z: number, id: BlockId): void;

@@ -321,28 +321,21 @@ export class PointsGenerator {
           },
           randomFunction
         );
-
-        points = generator
-          .fill()
-          .map((point): Vec2 => [
-            Math.floor(baseX + point[0]!),
-            Math.floor(baseZ + point[1]!)
-          ]);
       }
 
-      if (this.useIsPoint) {
-        pointsSet = new Set<string>();
+      points = generator
+        .fill()
+        .map((point): Vec2 => [
+          Math.floor(baseX + point[0]!),
+          Math.floor(baseZ + point[1]!)
+        ]);
+    }
 
-        if (!points) {
-          return {
-            pointsSet,
-            points: null
-          };
-        }
+    if (this.useIsPoint) {
+      pointsSet = new Set<string>();
 
-        for (const point of points) {
-          pointsSet.add(`${point[0]}|${point[1]}`);
-        }
+      for (const point of points) {
+        pointsSet.add(`${point[0]}|${point[1]}`);
       }
     }
 

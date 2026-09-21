@@ -82,10 +82,10 @@ export class BlockIdMappingManager {
         mappedBlockId = blockMetadata[mappedName]?.id ?? null;
 
         if (mappedBlockId === null) {
-          const rootBlock = blockMetadata[rootName];
+          const rootBlock = blockMetadata[rootName as BlockName];
 
           mappedBlockId =
-            rootBlock.rootMetaDesc === mappedName
+            "rootMetaDesc" in rootBlock && rootBlock.rootMetaDesc === mappedName
               ? rootBlock.id
               : blockId;
         }
