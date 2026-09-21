@@ -1,5 +1,5 @@
 import { ChunkSize, FixedPrefabField, HeightField } from "@/core/constants.js";
-import { FixedPointPrefabInfo } from "@/core/types.js";
+import { FixedPointPrefabInfo, Schematic } from "@/core/types.js";
 import { ChunkDataCache3D } from "@/data/cache/ChunkDataCache3D.js";
 import { lobbySchematic } from "@/schematics/datas/lobbySchematic.js";
 import { divideByChunkSize } from "@/utils/MathHelper.js";
@@ -13,6 +13,21 @@ const vI = 12
 
 type FixedPointPrefabName = keyof typeof lobbySchematic;
 
+export interface DecodedFixedPointPrefabInfo {
+  decodedPrefabSchematic: any;
+  bottomLeftX: number;
+  bottomLeftZ: number;
+  floorY: number;
+  ceilingY: number;
+  topRightX: number;
+  topRightZ: number;
+}
+
+interface FixedPointPrefabInfoForChunk {
+  decodedFixedPointPrefabsForChunk: DecodedFixedPointPrefabInfo[];
+  nearestFixedPrefabInfoForChunk: ChunkDataCache3D | null;
+}
+
 export class FixedPointPrefabManager {
   chunkSize: number;
   chunkToFixedPointPrefabs: Record<string, FixedPointPrefabInfo[]>;
@@ -25,7 +40,7 @@ export class FixedPointPrefabManager {
 
   constructor(
     fixedPointPrefabs: Array<{
-      AI: FixedPointPrefabName;
+      prefabName: FixedPointPrefabName;
       x: number;
       y: number;
       z: number;
@@ -35,14 +50,11 @@ export class FixedPointPrefabManager {
     this.chunkSize = chunkSize;
     this.chunkToFixedPointPrefabs = {};
 
-    const chunkToFixedPointPrefabs: Record<
-      string,
-      FixedPointPrefabInfo[]
-    > = {};
+    const chunkToFixedPointPrefabs: Record<string, FixedPointPrefabInfo[]> = {};
 
     const maxDistance = chunkSize + vI;
 
-    for (const { AI: prefabName, x, y, z } of fixedPointPrefabs) {
+    for (const { prefabName, x, y, z } of fixedPointPrefabs) {
       const schematic = lobbySchematic[prefabName];
 
       if (schematic === undefined) {
@@ -100,7 +112,7 @@ export class FixedPointPrefabManager {
   getFixedPointPrefabInfoForChunk(
     chunkX: number,
     chunkZ: number
-  ) {
+  ): FixedPointPrefabInfoForChunk  {
     const key = this.getKeyForChunk(chunkX, chunkZ);
     const prefabInfos = this.chunkToFixedPointPrefabs[key];
 
@@ -154,17 +166,13 @@ export class FixedPointPrefabManager {
     x: number,
     z: number,
     height: number,
-    fixedPrefabInfo: any
+    fixedPrefabInfo: ChunkDataCache3D | null
   ) {
     if (fixedPrefabInfo === null) {
       return null;
     }
 
-    const distance = fixedPrefabInfo.getOrGenerate(
-      x,
-      z,
-      FixedPrefabField.DistanceToNearestFixedPrefab
-    );
+    const distance = fixedPrefabInfo.getOrGenerate(x, z, FixedPrefabField.DistanceToNearestFixedPrefab);
 
     if (distance > vI) {
       return null;
@@ -173,11 +181,7 @@ export class FixedPointPrefabManager {
     let weight = distance / vI;
     weight *= weight;
 
-    const prefabHeight = fixedPrefabInfo.getOrGenerate(
-      x,
-      z,
-      FixedPrefabField.HeightOfNearestFixedPrefab
-    );
+    const prefabHeight = fixedPrefabInfo.getOrGenerate(x, z, FixedPrefabField.HeightOfNearestFixedPrefab);
 
     return Math.floor(height * weight + (1 - weight) * prefabHeight);
   }
@@ -185,7 +189,7 @@ export class FixedPointPrefabManager {
   static isNearFixedPointPrefab(
     x: number,
     z: number,
-    fixedPrefabInfo: any
+    fixedPrefabInfo: ChunkDataCache3D | null
   ): boolean {
     if (fixedPrefabInfo === null) {
       return false;
@@ -203,7 +207,7 @@ export class FixedPointPrefabManager {
   static isWithinFixedPointPrefab(
     x: number,
     z: number,
-    fixedPrefabInfo: any
+    fixedPrefabInfo: ChunkDataCache3D | null
   ): boolean {
     if (fixedPrefabInfo === null) {
       return false;
@@ -222,16 +226,9 @@ export class FixedPointPrefabManager {
     x: number,
     y: number,
     z: number,
-    prefabInfo: any
+    prefabInfo: DecodedFixedPointPrefabInfo
   ): number {
-    const {
-      bottomLeftX,
-      bottomLeftZ,
-      floorY,
-      ceilingY,
-      topRightX,
-      topRightZ
-    } = prefabInfo;
+    const { bottomLeftX, bottomLeftZ, floorY, ceilingY, topRightX, topRightZ } = prefabInfo;
 
     if (
       x < bottomLeftX ||
@@ -259,7 +256,7 @@ export class FixedPointPrefabManager {
     return `${chunkX}|${chunkZ}`;
   }
 
-  getDecodedPrefabSchematic(schematic: any) {
+  getDecodedPrefabSchematic(schematic: Schematic) {
     const name = schematic.name;
 
     const cachedSchematic = FixedPointPrefabManager.DECODED_FIXED_POINT_PREFAB_SCHEMATIC_CACHE.get(name);

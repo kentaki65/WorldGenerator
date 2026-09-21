@@ -8,12 +8,15 @@ import { FixedPointPrefabManager } from "../prefab/FixedPointPrefabManager.js";
 import { SeededRandom } from "@/noise/SeededRandom.js";
 import { BiomeSelector } from "@/biome/BiomeSelector.js";
 import { ChunkGeneratorCache } from "@/data/cache/ChunkGeneratorCache.js";
+import { ChunkDataCache3D } from "@/data/cache/ChunkDataCache3D.js";
+import { CaveDataView } from "../cave/CaveDataViewer.js";
+import { Biome } from "@/biome/Biome.js";
 
 type GeneratorFn = (dx: number, dz: number) => CanopyBlockPlacement;
 
 interface TreeSettings {
   maxTreeRadius: number;
-  biomeSelector: any;
+  biomeSelector: BiomeSelector;
 }
 
 interface TreeBlock {
@@ -327,7 +330,7 @@ export class TreeGenerator {
 
     let minTreeMinDist = 100000;
     let maxTreeMinDist = 0;
-    for (const biomeSelectorEntry of settings.biomeSelector.JI) {
+    for (const biomeSelectorEntry of settings.biomeSelector.biomeEntries) {
       if (biomeSelectorEntry.biome.treeMinDist) {
         minTreeMinDist = Math.min(minTreeMinDist, biomeSelectorEntry.biome.treeMinDist);
         maxTreeMinDist = Math.max(maxTreeMinDist, biomeSelectorEntry.biome.treeMinDist);
@@ -349,16 +352,16 @@ export class TreeGenerator {
   getTreesForChunk(
     chunkStartX: number,
     chunkStartZ: number,
-    heightmapVals: any,
+    heightmapVals: ChunkDataCache3D,
     biomeGrid: ChunkGeneratorCache,
-    caveData: any,
+    caveHeightmapVals: CaveDataView,
     placedPrefabs: PrefabCenter[],
-    fixedPrefabInfo: any,
+    fixedPrefabInfo: ChunkDataCache3D | null,
   ): TreePlacement[] {
     const trees = [];
     for (let worldX = chunkStartX - this.maxTreeRadius; worldX < chunkStartX + this.chunkSize + this.maxTreeRadius; worldX++) {
       for (let worldZ = chunkStartZ - this.maxTreeRadius; worldZ < chunkStartZ + this.chunkSize + this.maxTreeRadius; worldZ++) {
-        const biome = biomeGrid.getOrGenerate(worldX, worldZ)[0].biome;
+        const biome = biomeGrid.getOrGenerate(worldX, worldZ)[0]!.biome;
         if (biome.treeMinDist !== null) {
           if (biome.getTotalTreeChance() <= 0) {
             console.error("Biome", biome, "has 0 total tree chance");
@@ -370,7 +373,7 @@ export class TreeGenerator {
             continue;
           }
           const groundHeight = heightmapVals.getOrGenerate(worldX, worldZ, HeightField.GroundHeight);
-          if (CaveManager.isInCave(worldX, groundHeight, worldZ, caveData)) {
+          if (CaveManager.isInCave(worldX, groundHeight!, worldZ, caveHeightmapVals)) {
             continue;
           }
           if (PrefabGenerator.isWithinPrefabClearing(worldX, worldZ, placedPrefabs)) {
@@ -385,7 +388,7 @@ export class TreeGenerator {
           trees.push({
             treeX: worldX,
             treeZ: worldZ,
-            trunkBase: groundHeight + 1,
+            trunkBase: groundHeight! + 1,
             height: treeHeight,
             vineDir,
             treeType
@@ -410,17 +413,17 @@ export class TreeGenerator {
   }
 
   static getTreeTypeFromBiome(
-    biome: any,
+    biome: Biome,
     rng: SeededRandom
   ) {
     const randomValue = Math.floor(rng.next() * biome.getTotalTreeChance());
     let cumulativeChance = 0;
     let index = 0;
     while (cumulativeChance <= randomValue) {
-      cumulativeChance += biome.treeChances[index].chance;
+      cumulativeChance += biome.treeChances[index]!.chance;
       index++;
     }
-    return biome.treeChances[index - 1].treeType;
+    return biome.treeChances[index - 1]!.treeType;
   }
 
   addTreesToChunk(

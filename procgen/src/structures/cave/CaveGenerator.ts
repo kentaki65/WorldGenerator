@@ -1,23 +1,28 @@
 import { CaveField, HeightField, OUT_OF_RUNGE_NUMBER } from "@/core/constants.js";
+import { ChunkArray4D } from "@/data/array/ChunkArray4D.js";
+import { Sparse4DArray } from "@/data/array/Sparse4DArray.js";
 import { ChunkDataCache3D } from "@/data/cache/ChunkDataCache3D.js";
 import { getDistance, getDistanceToSegment } from "@/utils/MathHelper.js";
+import { PitCaveMetadataForChunk, RavineCaveMetadataForChunk, SpaghettiCaveMetadata, SphereCaveMetadataForChunk } from "./CaveMetadataManager.js";
+
+type CaveMetadata = ChunkArray4D | Sparse4DArray;
 
 export class CaveGenerator {
   heightmapVals: ChunkDataCache3D;
-  spaghettiCaveMetadataForChunk: any;
-  pitCaveMetadataForChunk: any;
-  ravineCaveMetadataForChunk: any;
-  sphereCaveMetadataForChunk: any;
+  spaghettiCaveMetadataForChunk: SpaghettiCaveMetadata[];
+  pitCaveMetadataForChunk: PitCaveMetadataForChunk[];
+  ravineCaveMetadataForChunk: RavineCaveMetadataForChunk[];
+  sphereCaveMetadataForChunk: SphereCaveMetadataForChunk[];
   numCaveTypes: number;
 
   static SPAGHETTI_CAVE_EDGE_CUTOFF = 0.08;
 
   constructor(
     heightmapVals: ChunkDataCache3D,
-    spaghettiCaveMetadataForChunk: any,
-    pitCaveMetadataForChunk: any,
-    ravineCaveMetadataForChunk: any,
-    sphereCaveMetadataForChunk: any,
+    spaghettiCaveMetadataForChunk: SpaghettiCaveMetadata[],
+    pitCaveMetadataForChunk: PitCaveMetadataForChunk[],
+    ravineCaveMetadataForChunk: RavineCaveMetadataForChunk[],
+    sphereCaveMetadataForChunk: SphereCaveMetadataForChunk[],
     numCaveTypes: number
   ) {
     this.heightmapVals = heightmapVals;
@@ -28,7 +33,7 @@ export class CaveGenerator {
     this.numCaveTypes = numCaveTypes;
   }
 
-  generateAndSet(chunkX: number, chunkZ: number, caveMetadata: any) {
+  generateAndSet(chunkX: number, chunkZ: number, caveMetadata: CaveMetadata) {
     this.setDefaultCaves(chunkX, chunkZ, caveMetadata);
     this.generateAndSetSpaghettiCaves(chunkX, chunkZ, caveMetadata);
     this.generateAndSetPitCaves(chunkX, chunkZ, caveMetadata);
@@ -37,7 +42,7 @@ export class CaveGenerator {
     this.removeCavesNearWater(chunkX, chunkZ, caveMetadata);
   }
 
-  setDefaultCaves(chunkX: number, chunkZ: number, caveMetadata: any) {
+  setDefaultCaves(chunkX: number, chunkZ: number, caveMetadata: CaveMetadata) {
     for (let caveType = 0; caveType < this.numCaveTypes; caveType++) {
       caveMetadata.set(
         chunkX,
@@ -57,7 +62,7 @@ export class CaveGenerator {
     }
   }
 
-  generateAndSetSpaghettiCaves(chunkX: number, chunkZ: number, caveMetadata: any) {
+  generateAndSetSpaghettiCaves(chunkX: number, chunkZ: number, caveMetadata: CaveMetadata) {
     for (const metadata of this.spaghettiCaveMetadataForChunk) {
       const edgeNoise = metadata.caveEdgeNoiseGenerator.getOctaves(chunkX, chunkZ);
 
@@ -134,7 +139,7 @@ export class CaveGenerator {
     }
   }
 
-  generateAndSetPitCaves(chunkX: number, chunkZ: number, caveMetadata: any) {
+  generateAndSetPitCaves(chunkX: number, chunkZ: number, caveMetadata: CaveMetadata) {
     for (const metadata of this.pitCaveMetadataForChunk) {
       const pitMinX = metadata.pitMinX;
       const pitMaxX = metadata.pitMaxX;
@@ -175,7 +180,7 @@ export class CaveGenerator {
 
       const heightPerturb = hasNoHeightPerturbation
         ? 0
-        : metadata.pitHeightPerturbNoiseGenerator.getOctaves(
+        : metadata.pitHeightPerturbNoiseGenerator!.getOctaves(
           chunkX,
           chunkZ
         );
@@ -244,7 +249,7 @@ export class CaveGenerator {
         caveMetadata.set(
           chunkX,
           chunkZ,
-          metadata.ceilingType,
+          metadata.ceilingType!,
           CaveField.FloorY,
           ceilingY
         );
@@ -252,7 +257,7 @@ export class CaveGenerator {
         caveMetadata.set(
           chunkX,
           chunkZ,
-          metadata.ceilingType,
+          metadata.ceilingType!,
           CaveField.CeilingY,
           ceilingY + metadata.pitCeilingThickness
         );
@@ -276,7 +281,7 @@ export class CaveGenerator {
     }
   }
 
-  generateAndSetRavineCaves(chunkX: number, chunkZ: number, caveMetadata: any) {
+  generateAndSetRavineCaves(chunkX: number, chunkZ: number, caveMetadata: CaveMetadata) {
     for (const metadata of this.ravineCaveMetadataForChunk) {
       const ravineCentre = metadata.ravineCentre;
       const ravineWidth = metadata.ravineWidth;
@@ -379,7 +384,7 @@ export class CaveGenerator {
     }
   }
 
-  generateAndSetSphereCaves(chunkX: number, chunkZ: number, caveMetadata: any) {
+  generateAndSetSphereCaves(chunkX: number, chunkZ: number, caveMetadata: CaveMetadata) {
     for (const metadata of this.sphereCaveMetadataForChunk) {
       const perturbedX =
         chunkX +
@@ -449,7 +454,7 @@ export class CaveGenerator {
     }
   }
 
-  removeCavesNearWater(chunkX: number, chunkZ: number, caveMetadata: any) {
+  removeCavesNearWater(chunkX: number, chunkZ: number, caveMetadata: CaveMetadata) {
     const cavesAllowedBelowY =
       this.heightmapVals.getOrGenerate(
         chunkX,

@@ -1,16 +1,17 @@
 import { Vec2 } from "@/core/types.js";
 import { SeededRandom } from "@/noise/SeededRandom.js";
+import { PointsGenerator } from "./PointsGenerator.js";
 
 export class FeaturePointGenerator {
   chunkSize: number;
-  pointsGenerator: any;
+  pointsGenerator: PointsGenerator;
   seed: string | number;
   tempChunkCoord: Vec2;
   chunkSearchRadius: number;
 
   constructor(
     chunkSize: number,
-    pointsGenerator: any,
+    pointsGenerator: PointsGenerator,
     searchRadiusSize: number,
     seed: string | number,
   ) {
@@ -27,12 +28,20 @@ export class FeaturePointGenerator {
     return this.tempChunkCoord;
   }
 
-  getSurroundingFeatures(x: number, z: number) {
+  getSurroundingFeatures(x: number, z: number): Vec2[] {
     const chunkCoord = this.getChunkCoordFromGlobalCoord(x, z);
-    const features = [];
+    const features: Vec2[] = [];
 
-    for (let chunkX = chunkCoord[0] - this.chunkSearchRadius; chunkX <= chunkCoord[0] + this.chunkSearchRadius; chunkX++) {
-      for (let chunkZ = chunkCoord[1] - this.chunkSearchRadius; chunkZ <= chunkCoord[1] + this.chunkSearchRadius; chunkZ++) {
+    for (
+      let chunkX = chunkCoord[0] - this.chunkSearchRadius;
+      chunkX <= chunkCoord[0] + this.chunkSearchRadius;
+      chunkX++
+    ) {
+      for (
+        let chunkZ = chunkCoord[1] - this.chunkSearchRadius;
+        chunkZ <= chunkCoord[1] + this.chunkSearchRadius;
+        chunkZ++
+      ) {
         if (this.pointsGenerator.isPoint(chunkX, chunkZ)) {
           features.push(
             this.getRandomPointInChunk(chunkX, chunkZ)
@@ -44,7 +53,7 @@ export class FeaturePointGenerator {
     return features;
   }
 
-  getRandomPointInChunk(chunkX: number, chunkZ: number) {
+  getRandomPointInChunk(chunkX: number, chunkZ: number): Vec2 {
     const baseX = chunkX * this.chunkSize;
     const baseZ = chunkZ * this.chunkSize;
 

@@ -3,17 +3,21 @@ import { NoWaterHeightmap } from "./NoWaterHeightmap.js";
 import { WaterBodyGenerator } from "@/structures/water/WaterBodyGenerator.js";
 import { HeightField, OUT_OF_RUNGE_NUMBER } from "@/core/constants.js";
 import { FixedPointPrefabManager } from "@/structures/prefab/FixedPointPrefabManager.js";
+import { ChunkDataCache3D } from "@/data/cache/ChunkDataCache3D.js";
+import { ChunkGeneratorCache } from "@/data/cache/ChunkGeneratorCache.js";
+import { Sparse3DArray } from "@/data/array/Sparse3DArray.js";
+import { Biome } from "@/biome/Biome.js";
 
 export class HeightmapGenerator {
-  closestBiomesForChunk: any;
-  nearestFixedPrefabInfoForChunk: any;
+  closestBiomesForChunk: ChunkGeneratorCache;
+  nearestFixedPrefabInfoForChunk: ChunkDataCache3D;
   noWaterHeightmapGenerator: NoWaterHeightmap;
   heightmapPerturb: SimpleOctavesNoise;
   waterBodyGenerator: WaterBodyGenerator;
 
   constructor(
-    closestBiomesForChunk: any,
-    nearestFixedPrefabInfoForChunk: any,
+    closestBiomesForChunk: ChunkGeneratorCache,
+    nearestFixedPrefabInfoForChunk: ChunkDataCache3D,
     noWaterHeightmapGenerator: NoWaterHeightmap,
     heightmapPerturb: SimpleOctavesNoise,
     waterBodyGenerator: WaterBodyGenerator
@@ -28,7 +32,7 @@ export class HeightmapGenerator {
   generateAndSet(
     chunkStartX: number,
     chunkStartZ: number,
-    heightmapVals: any
+    heightmapVals: Sparse3DArray
   ) {
     const biomeInfos = this.closestBiomesForChunk.getOrGenerate(
       chunkStartX,
@@ -68,7 +72,10 @@ export class HeightmapGenerator {
   getWithWaterHeightmapVal(
     x: number,
     z: number,
-    biomeInfos: any
+    biomeInfos: {
+      biome: Biome;
+      weight: number;
+    }[]
   ) {
     const noWaterHeight = this.noWaterHeightmapGenerator.getNoWaterHeightmapVal(
       x,
@@ -102,14 +109,14 @@ export class HeightmapGenerator {
           waterProgress *= waterProgress * waterProgress;
           groundHeight = Math.floor(
             waterbedHeight +
-              (waterHeight - waterbedHeight) * waterProgress -
-              2
+            (waterHeight - waterbedHeight) * waterProgress -
+            2
           );
         } else {
           waterProgress *= waterProgress;
           groundHeight = Math.floor(
             waterbedHeight +
-              (waterHeight - waterbedHeight) * waterProgress
+            (waterHeight - waterbedHeight) * waterProgress
           );
         }
 
@@ -149,7 +156,7 @@ export class HeightmapGenerator {
     z: number,
     xPerturb: number,
     zPerturb: number,
-    heightmapVals: any,
+    heightmapVals: Sparse3DArray,
     groundHeight: number,
     waterHeight: number,
     cavesAllowedBelowY: number

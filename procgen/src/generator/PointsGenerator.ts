@@ -36,7 +36,7 @@ export class PointsGenerator {
     max: number;
   } | null = null;
   useJitteredGrid: boolean;
-  customCellGap: any | undefined;
+  customCellGap: number | undefined;
   gridSize: number;
   useIsPoint: boolean;
   useKthClosestPoint: boolean;

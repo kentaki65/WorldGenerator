@@ -4,8 +4,9 @@ import { treeStractures } from "./TreeStructures.js";
 import { WeightedDistribution } from "@/random/WeightedDistribution.js";
 import { jungleStructures } from "./JungleStructures.js";
 import { dungeonStructures } from "./DungeonStructures.js";
+import { PrefabDefinition } from "@/core/types.js";
 
-export const prefabDefinitions = {
+export const prefabDefinitions: Record<string, PrefabDefinition> = {
   treeMapleLarge1: {
     schematic: treeStractures.treeMapleLarge1,
     groundingPoints: "centre",
@@ -2565,8 +2566,8 @@ export const prefabDefinitions = {
     groundingRadius: 4,
     clearingRadiusSquared: 0,
     undergroundYInterval: {
-      YI: -15,
-      VI: -97
+      minY: -15,
+      maxY: -97
     },
     yOffset: -2,
     transformationsEnabled: true,
@@ -2625,8 +2626,8 @@ export const prefabDefinitions = {
     groundingRadius: 2,
     clearingRadiusSquared: 0,
     undergroundYInterval: {
-      YI: -40,
-      VI: -97
+      minY: -40,
+      maxY: -97
     },
     yOffset: -2,
     transformationsEnabled: true,
@@ -2699,8 +2700,8 @@ export const prefabDefinitions = {
     groundingRadius: 2,
     clearingRadiusSquared: 0,
     undergroundYInterval: {
-      YI: -60,
-      VI: -95
+      minY: -60,
+      maxY: -95
     },
     yOffset: -4,
     transformationsEnabled: true,
@@ -2818,8 +2819,8 @@ export const prefabDefinitions = {
     groundingRadius: 2,
     clearingRadiusSquared: 0,
     undergroundYInterval: {
-      YI: -70,
-      VI: -95
+      minY: -70,
+      maxY: -95
     },
     yOffset: -4,
     transformationsEnabled: true,

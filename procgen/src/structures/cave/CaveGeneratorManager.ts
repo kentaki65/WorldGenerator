@@ -1,14 +1,21 @@
 import { ChunkSize } from "@/core/constants.js";
 import { ChunkArray4D } from "@/data/array/ChunkArray4D.js";
 import { Sparse4DArray } from "@/data/array/Sparse4DArray.js";
+import { ChunkDataCache3D } from "@/data/cache/ChunkDataCache3D.js";
 import { divideByChunkSize } from "@/utils/MathHelper.js";
+import { CaveMetadataManager } from "./CaveMetadataManager.js";
+import { CaveGenerator } from "./CaveGenerator.js";
 
 export class CaveGeneratorManager {
-  caveMetadataForChunkCache: any;
-  heightmapVals: any;
-  caveGeneratorsPerChunk: any[];
+  caveMetadataForChunkCache: CaveMetadataManager;
+  heightmapVals: ChunkDataCache3D;
+  caveGeneratorsPerChunk: CaveGenerator[][];;
 
-  constructor(caveMetadataForChunkCache: any, heightmapVals: any, chunkSize: number) {
+  constructor(
+    caveMetadataForChunkCache: CaveMetadataManager, 
+    heightmapVals: ChunkDataCache3D, 
+    chunkSize: number
+  ) {
     this.caveMetadataForChunkCache = caveMetadataForChunkCache;
     this.heightmapVals = heightmapVals;
     this.caveGeneratorsPerChunk = [];

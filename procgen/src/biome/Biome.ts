@@ -1,5 +1,5 @@
 import { BiomeRegion, CaveLayer, FeatureHeight, TreeType } from "@/core/constants.js";
-import { BiomeConstructorOptions, BlockMetadata, PrefabFrequency, Seed } from "@/core/types.js";
+import { BiomeConstructorOptions, BlockMetadata, Prefab, PrefabFrequency, Seed } from "@/core/types.js";
 import { WeightedDistribution } from "@/random/WeightedDistribution.js";
 import { FloraGenerator } from "@/structures/flora/FloraGenerator.js";
 import { OreGenerator } from "@/structures/ore/oreGenerator.js";
@@ -8,6 +8,7 @@ import { dungeonPrefabFrequencies } from "@/structures/prefab/prefabDatas/prefab
 import { prefabDefinitions } from "@/structures/prefab/prefabDatas/prefabDefinitions.js";
 import { SimpleOctavesNoise } from "@/noise/SimpleOctaveNoise.js";
 import { WorldGenerator } from "@/generator/WorldGenerator.js";
+import { SeededRandom } from "@/noise/SeededRandom.js";
 
 interface PrefabFrequencyParams {
   prefabFrequencies: PrefabFrequency[];
@@ -21,12 +22,7 @@ interface PrefabDensitySetting {
 
 interface PrefabDataEntry {
   density: number;
-  distribution: WeightedDistribution<any>; // sI (weighted distribution) のインスタンス
-}
-
-interface WorldGeneratorLike {
-  prefabSize: number;
-  maxPrefabGroundingRadius: number;
+  distribution: WeightedDistribution<Prefab | null>; // sI (weighted distribution) のインスタンス
 }
 
 interface TreeChanceEntry {
@@ -44,7 +40,7 @@ export class Biome {
   chunkSize!: number;
   treeMinDist: number | null = 5;
   _heightmapSimplex!: SimpleOctavesNoise;
-  worldGenerator!: any;
+  worldGenerator!: WorldGenerator;
   oreGenerator!: OreGenerator;
   floraGenerator!: FloraGenerator;
 
@@ -297,7 +293,7 @@ export class Biome {
     return this.totalTreeChance;
   }
 
-  getRandomPrefab(rng: any, placementType: number, density: number): any {
+  getRandomPrefab(rng: SeededRandom, placementType: number, density: number) {
     const entry = this.prefabDataPerType?.[placementType];
     if (entry === undefined || entry === null || entry.density !== density) {
       return null;

@@ -60,7 +60,7 @@ export class LootChestGenerator {
     }
   }
 
-  sample(random: SeededRandom): any[] {
+  sample(random: SeededRandom) {
     const items = Array<any | null>(36).fill(null);
     let itemIndex = 0;
 

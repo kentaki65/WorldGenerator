@@ -1,4 +1,4 @@
-import { Vec3Object } from "@/core/types.js";
+import { Vec3, Vec3Object } from "@/core/types.js";
 import { Sparse3DMap } from "@/data/array/Sparse3DMap.js";
 
 export class RLEChunkContainer {
@@ -40,7 +40,7 @@ export class RLEChunkContainer {
   }
 
   *getRLECoords(): Generator<[number, number, number]> {
-    const coord: [number, number, number] = [0, 0, 0];
+    const coord: Vec3 = [0, 0, 0];
 
     for (const { x, y, z } of this.rleChunkStorage) {
       coord[0] = x;

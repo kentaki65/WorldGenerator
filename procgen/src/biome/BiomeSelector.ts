@@ -1,4 +1,4 @@
-import { BlockMetadata, Seed, Vec2 } from "@/core/types.js";
+import { BlockId, BlockMetadata, Seed, Vec2 } from "@/core/types.js";
 import { OreGenerator } from "@/structures/ore/oreGenerator.js";
 import { Biome } from "./Biome.js";
 import { PointsGenerator } from "@/generator/PointsGenerator.js";
@@ -7,12 +7,23 @@ import { SeededRandom } from "@/noise/SeededRandom.js";
 import { ChunkArray2D } from "@/data/array/ChunkArray2D.js";
 import { selectWeightedIndex } from "./biomeUtils.js";
 import { WorldGenerator } from "@/generator/WorldGenerator.js";
+import { ChunkGeneratorCache } from "@/data/cache/ChunkGeneratorCache.js";
+
+interface MostRecentlyAccessedModifier {
+  stoneTypeId: BlockId
+}
+
+interface StoneType {
+  stoneId: number;
+  frequency: number;
+}
 
 interface BiomeEntry {
   biome: Biome;
   frequency: number;
   altBiome: Biome | null;
-  stoneTypes: any;
+
+  stoneTypes: StoneType[];
   stoneFrequencies: number[];
   stonesTotalFrequency: number;
 }
@@ -21,7 +32,7 @@ export interface BiomeGenerateResult {
   weight: number;
   biome: Biome;
   biomeId: number;
-  biomeModifiers: any | null;
+  biomeModifiers: MostRecentlyAccessedModifier | null;
 }
 
 export class BiomeSelector {
@@ -40,7 +51,7 @@ export class BiomeSelector {
     biomeId: number;
   } | undefined;
   mostRecentlyAccessedModifierPt: Vec2;
-  mostRecentlyAccessedModifier: any | undefined;
+  mostRecentlyAccessedModifier: MostRecentlyAccessedModifier | undefined;
 
   constructor(
     worldGenerator: WorldGenerator,
@@ -231,7 +242,7 @@ export class BiomeSelector {
   getBiomeInfoForChunkFill(
     chunkStartX: number,
     chunkStartZ: number,
-    biomeGrid: any
+    biomeGrid: ChunkGeneratorCache
   ) {
     const result = {
       biomeIds: new ChunkArray2D(this.chunkSize, [chunkStartX, chunkStartZ]),
@@ -240,9 +251,9 @@ export class BiomeSelector {
 
     for (let worldX = chunkStartX; worldX < chunkStartX + this.chunkSize; worldX++) {
       for (let worldZ = chunkStartZ; worldZ < chunkStartZ + this.chunkSize; worldZ++) {
-        const point = biomeGrid.getOrGenerate(worldX, worldZ)[0];
+        const point = biomeGrid.getOrGenerate(worldX, worldZ)[0]!;
         result.biomeIds.set(worldX, worldZ, point.biomeId);
-        result.stoneTypeIds.set(worldX, worldZ, point.biomeModifiers.stoneTypeId);
+        result.stoneTypeIds.set(worldX, worldZ, point.biomeModifiers!.stoneTypeId);
       }
     }
 

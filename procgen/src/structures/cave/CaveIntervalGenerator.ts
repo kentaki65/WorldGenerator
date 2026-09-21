@@ -1,9 +1,10 @@
+import { CaveDataView } from "./CaveDataViewer.js";
 import { getCaveIntervals } from "./CaveUtils.js";
 
 export class CaveIntervalGenerator {
-  caveHeightmapVals: any;
+  caveHeightmapVals: CaveDataView;
 
-  constructor(caveHeightmapVals: any) {
+  constructor(caveHeightmapVals: CaveDataView) {
     this.caveHeightmapVals = caveHeightmapVals;
   }
 

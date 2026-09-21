@@ -8,11 +8,15 @@ import { BlockPlacementMode, HeightField, OUT_OF_RUNGE_NUMBER, TERRAIN_LEVELS } 
 import { Sparse3DMap } from "@/data/array/Sparse3DMap.js";
 import { CaveManager } from "@/structures/cave/CaveManager.js";
 import { CaveDecorationGenerator } from "@/structures/cave/CaveDecorationGenerator.js";
-import { CaveDataView } from "@/structures/cave/CaveDataViewer.js";
-import { FixedPointPrefabManager } from "@/structures/prefab/FixedPointPrefabManager.js";
-import { BlockMetadata, PrefabInstance, Seed, TreePlacement } from "@/core/types.js";
+import { CaveDataView, InnerChunkCaveDataView } from "@/structures/cave/CaveDataViewer.js";
+import { DecodedFixedPointPrefabInfo, FixedPointPrefabManager } from "@/structures/prefab/FixedPointPrefabManager.js";
+import { BlockMetadata, GeneratedPrefabPlacement, PrefabInstance, Seed, TreePlacement } from "@/core/types.js";
 import { SeededRandom } from "@/noise/SeededRandom.js";
 import { squaredDistanceToPoint } from "@/utils/MathHelper.js";
+import { LootChestBlockGenerator } from "@/structures/lootChest/LootChestBlockGenerator.js";
+import { ChunkDataCache3D } from "@/data/cache/ChunkDataCache3D.js";
+import { CombinedArray3D } from "@/data/array/CombinedArray3D.js";
+import { ChunkArray2D } from "@/data/array/ChunkArray2D.js";
 
 interface SpecialBlockEntry {
   x: number;
@@ -24,18 +28,16 @@ interface SpecialBlockEntry {
   };
 }
 
-interface ChunkArrayLike {
-  set(x: number, y: number, z: number, value: number): void;
-  get(x: number, y: number, z: number): number;
-}
-
-interface HeightmapValsLike {
-  get(x: number, z: number, field: unknown): number;
+interface ClusterCell {
+  x: number;
+  y: number;
+  z: number;
+  blockId: number;
 }
 
 interface BiomeInfo {
-  biomeIds: { get(x: number, z: number): number };
-  stoneTypeIds: { get(x: number, z: number): number };
+  biomeIds: ChunkArray2D;
+  stoneTypeIds: ChunkArray2D;
 }
 
 interface FillChunkResult {
@@ -87,19 +89,19 @@ export class ChunkGenerator {
   }
 
   fillChunk(
-    chunkArray: ChunkArrayLike,
+    chunkArray: any,
     chunkStartX: number,
     chunkStartY: number,
     chunkStartZ: number,
-    heightmapVals: HeightmapValsLike,
+    heightmapVals: CombinedArray3D,
     treeData: TreePlacement[],
-    prefabData: PrefabInstance[],
-    caveData: CaveDataView,
+    prefabData: GeneratedPrefabPlacement[],
+    caveData: InnerChunkCaveDataView,
     oreData: number[],
     biomeInfo: BiomeInfo,
-    fixedPrefabInfo: unknown,
-    fixedPrefabs: unknown[],
-    caveDecorations: any[]
+    fixedPrefabInfo: ChunkDataCache3D | null,
+    fixedPrefabs: DecodedFixedPointPrefabInfo[],
+    caveDecorations: ClusterCell[]
   ): FillChunkResult {
     if (chunkStartY + this.chunkSize <= TERRAIN_LEVELS.bedrockLevel) {
       return {
@@ -107,7 +109,7 @@ export class ChunkGenerator {
       };
     }
 
-    const specialBlockGenerators = new Sparse3DMap();
+    const specialBlockGenerators = new Sparse3DMap<LootChestBlockGenerator>();
 
     let maxGroundHeight = -10000;
     let minGroundHeight = 10000;

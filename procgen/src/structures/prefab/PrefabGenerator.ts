@@ -17,6 +17,9 @@ import { isNullOrUndefined } from "@/utils/utils.js";
 import { divideByChunkSize } from "@/utils/MathHelper.js";
 import voxelCrunch from 'voxel-crunch';
 import { LootChestBlockGenerator } from "../lootChest/LootChestBlockGenerator.js";
+import { ChunkDataCache3D } from "@/data/cache/ChunkDataCache3D.js";
+import { ChunkGeneratorCache } from "@/data/cache/ChunkGeneratorCache.js";
+import { CaveDataView } from "../cave/CaveDataViewer.js";
 
 type PrefabCentrePointGenerators = Record<number, Record<number, PointsGenerator | null>>
 
@@ -29,7 +32,7 @@ export class PrefabGenerator {
   defaultSpawnerBlockId: BlockId;
   mobTypeToSpawnerBlockId: Record<CaveMobNames, BlockId>;
   prefabRadius: number;
-  prefabCentrePointGeneratorPerDensityPerType: any;
+  prefabCentrePointGeneratorPerDensityPerType: PrefabCentrePointGenerators;
 
   static DECODED_PREFAB_SCHEMATIC_CACHE = new TTLCache({
     max: 1000,
@@ -42,16 +45,7 @@ export class PrefabGenerator {
   static DEFAULT_CHEST_QUALITY = Rarity.COMMON;
 
   constructor(options: PrefabConfig) {
-    this.prefabCentrePointGeneratorPerDensityPerType = undefined;
-
-    const {
-      seed,
-      chunkSize,
-      blockMetadata,
-      itemMetadata,
-      prefabSize,
-      typeSettings
-    } = options;
+    const { seed, chunkSize, blockMetadata, itemMetadata, prefabSize, typeSettings } = options;
 
     PrefabGenerator.BLOCK_ID_MAPPINGS ||= new BlockIdMappingManager(blockMetadata);
     EE ||= new EnchantmentGenerator(itemMetadata);
@@ -126,10 +120,10 @@ export class PrefabGenerator {
   getPrefabsForChunk(
     chunkStartX: number,
     chunkStartZ: number,
-    heightmapVals: any,
-    biomeGrid: any,
-    caveData: any,
-    fixedPrefabInfo: any
+    heightmapVals: ChunkDataCache3D,
+    biomeGrid: ChunkGeneratorCache,
+    caveData: CaveDataView,
+    fixedPrefabInfo: ChunkDataCache3D
   ) {
     const prefabsForChunk = [];
     const halfChunkSize = this.chunkSize >> 1;
@@ -159,7 +153,7 @@ export class PrefabGenerator {
             continue;
           }
 
-          const biome = biomeGrid.getOrGenerate(pointX, pointZ)[0].biome;
+          const biome = biomeGrid.getOrGenerate(pointX, pointZ)[0]!.biome;
           const rng = new SeededRandom(`${pointX}|${pointZ}|${this.seed}|prefabGenerator`);
           const selectedPrefab = biome.getRandomPrefab(rng, density, type);
           if (selectedPrefab === null) {
@@ -251,11 +245,11 @@ export class PrefabGenerator {
   }
 
   getPrefabGroundingInfo(
-    placement: any,
+    placement: PrefabPlacement,
     rng: SeededRandom,
-    heightmapVals: any,
-    caveData: any,
-    fixedPrefabInfo: any
+    heightmapVals: ChunkDataCache3D,
+    caveData: CaveDataView,
+    fixedPrefabInfo: ChunkDataCache3D
   ) {
     const prefab = placement.prefab;
     const centreX = placement.centreX;
@@ -301,9 +295,9 @@ export class PrefabGenerator {
   getSurfaceGroundingInfoFromGroundingPoints(
     groundingPoints: Vec2[],
     groundingRadius: number,
-    heightmapVals: any,
-    caveData: any,
-    fixedPrefabInfo: any
+    heightmapVals: ChunkDataCache3D,
+    caveData: CaveDataView,
+    fixedPrefabInfo: ChunkDataCache3D
   ) {
     let minGroundHeight = 10000;
 
@@ -341,7 +335,7 @@ export class PrefabGenerator {
     rng: SeededRandom,
     minY: number,
     maxY: number,
-    caveData: any
+    caveData: CaveDataView
   ) {
     const candidateFloors: CaveInterval[] = [];
 
@@ -389,7 +383,7 @@ export class PrefabGenerator {
     worldY: number,
     worldZ: number,
     prefab: PrefabInstance,
-    specialBlockGenerators: any
+    specialBlockGenerators: Sparse3DMap<LootChestBlockGenerator>
   ) {
     let blockId = this.getPrefabBlock(worldX, worldY, worldZ, prefab);
     if (blockId === 0) {
@@ -428,14 +422,14 @@ export class PrefabGenerator {
       return 0;
     }
 
-    const localX = function (placement: any, worldX: number, worldZ: number) {
+    const localX = function (placement: PrefabPlacement, worldX: number, worldZ: number) {
       if (placement.shouldSwapXZ) {
         return worldToPrefabZ(placement, worldZ);
       }
       return worldToPrefabX(placement, worldX);
     }(prefab, worldX, worldZ);
 
-    const localZ = function (placement: any, worldX: number, worldZ: number) {
+    const localZ = function (placement: PrefabPlacement, worldX: number, worldZ: number) {
       if (placement.shouldSwapXZ) {
         return worldToPrefabX(placement, worldX);
       }

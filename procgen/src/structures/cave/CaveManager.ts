@@ -1,10 +1,11 @@
 import { CaveField, HeightField, OUT_OF_RUNGE_NUMBER } from "@/core/constants.js";
-import { BlockId, BlockMetadata, ChunkArray, Vec2 } from "@/core/types.js";
+import { BlockId, BlockMetadata, BlockName, ChunkArray, Seed, Vec2 } from "@/core/types.js";
 import { CaveDataView, InnerChunkCaveDataView } from "./CaveDataViewer.js";
 import { SeededRandom } from "@/noise/SeededRandom.js";
 import { ChunkDataCache4D } from "@/data/cache/ChunkDataCache4D.js";
 import { CaveGeneratorManager } from "./CaveGeneratorManager.js";
 import { CaveMetadataManager } from "./CaveMetadataManager.js";
+import { ChunkDataCache3D } from "@/data/cache/ChunkDataCache3D.js";
 
 type CaveData = CaveDataView | InnerChunkCaveDataView;
 
@@ -13,15 +14,15 @@ export class CaveManager {
   caveMetadataForChunkCache;
 
   constructor(
-    caveGeneratorConfig: any,
+    seed: Seed,
     chunkSize: number,
     blockMetadata: BlockMetadata,
-    BlockName: any | "Lava",
+    BlockName: BlockName | "Lava",
   ) {
     this.chunkSize = chunkSize;
     //洞窟の本体クラス
     this.caveMetadataForChunkCache = new CaveMetadataManager(
-      caveGeneratorConfig,
+      seed,
       chunkSize,
       blockMetadata,
       BlockName
@@ -46,7 +47,7 @@ export class CaveManager {
     minY: number,
     chunkZ: number,
     groundHeightmap: any,
-    caveData: any,
+    caveData: InnerChunkCaveDataView,
   ) {
     const random = new SeededRandom(`caveBlocks${chunkX}|${minY}|${chunkZ}`);
 
@@ -81,7 +82,7 @@ export class CaveManager {
   getCaveHeightmapVals(
     x: number, 
     z: number, 
-    heightmapVals: any
+    heightmapVals: ChunkDataCache3D
   ) {
     const chunkCoord: Vec2 = [x, z];
     const caveMetadata = new CaveGeneratorManager(

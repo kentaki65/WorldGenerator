@@ -2,11 +2,16 @@ import { Seed } from "@/core/types.js";
 import SimplexNoise from "simplex-noise";
 
 //WH
+interface Octave {
+  amplitude: number;
+  frequency: number;
+}
+
 export class SimpleOctavesNoise {
   simplexes: SimplexNoise[];
-  customOctaves: any;
+  customOctaves: Octave[];
 
-  constructor(octaves: any, seed: Seed) {
+  constructor(octaves: Octave[], seed: Seed) {
     if (seed === undefined) console.log("Seed must be defined");
 
     this.simplexes = [];

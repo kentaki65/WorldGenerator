@@ -3351,8 +3351,18 @@ export interface GroundHeightmap {
 
 }
 
+export interface Schematic {
+  name: string;
+  dimensions: {
+    x: number;
+    y: number;
+    z: number;
+  };
+  getRLEChunk(x: number, y: number, z: number): any;
+}
+
 export interface FixedPointPrefabInfo {
-  schematic: any;
+  schematic: Schematic;
   bottomLeftX: number;
   bottomLeftZ: number;
   floorY: number;
@@ -3390,28 +3400,50 @@ export interface PrefabConfig {
   typeSettings: any;
 }
 
-export interface Prefab {
-  dimensionX: number;
-  dimensionY: number;
-  dimensionZ: number;
-
+export interface PrefabDefinition {
+  schematic: {
+    name: string;
+    dimensions: {
+      x: number;
+      y: number;
+      z: number;
+    };
+    getRLEChunk(x: number, y: number, z: number): any;
+  };
+  clearingRadiusSquared: number;
+  groundingRadius: number;
+  groundingPoints:
+  | "centre"
+  | {
+    localX: number;
+    localZ: number;
+  }[];
+  undergroundYInterval: {
+    minY: number;
+    maxY: number;
+  } | null;
+  yOffset: number;
   chestLocations: {
     localX: number;
     localY: number;
     localZ: number;
+    qualityDistribution?: WeightedDistribution<Rarity>;
   }[];
-
   spawnerBlockLocations: {
     localX: number;
     localY: number;
     localZ: number;
+    mobTypeDistribution?: WeightedDistribution<string>;
   }[];
-
-  schematic: {
-    name: string;
-    getRLEChunk(x: number, y: number, z: number): any;
-  };
+  transformationsEnabled?: boolean;
 }
+
+export interface Prefab extends PrefabDefinition {
+  dimensionX: number;
+  dimensionY: number;
+  dimensionZ: number;
+}
+
 
 export interface PrefabCenter {
   centreX: number;

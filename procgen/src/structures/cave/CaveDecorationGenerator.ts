@@ -7,6 +7,13 @@ import { interpolateClusterValue } from "@/utils/MathHelper.js";
 import { ChunkDataCache3D } from "@/data/cache/ChunkDataCache3D.js";
 import { CaveDataView } from "./CaveDataViewer.js";
 
+interface ClusterCell {
+  x: number;
+  y: number;
+  z: number;
+  blockId: number;
+}
+
 function isInsideDecoratableCave(
   x: number,
   y: number,
@@ -28,7 +35,7 @@ export class CaveDecorationGenerator {
   chunkSize: number;
   seed: Seed;
   pointsGen: PointsGenerator;
-  configs: any[];
+  configs: ClusterSettingsResult[];
   maxHalfBox: number;
 
   constructor(
@@ -74,17 +81,7 @@ export class CaveDecorationGenerator {
       );
     }
 
-    this.pointsGen = new PointsGenerator(
-      "caveDeco",
-      10,
-      false,
-      true,
-      seed,
-      4,
-      chunkSize,
-      null,
-      true
-    );
+    this.pointsGen = new PointsGenerator("caveDeco", 10, false, true, seed, 4, chunkSize, null, true);
 
     this.pointsGen.assertReachableFromChunkCentre(
       chunkSize,
@@ -100,8 +97,8 @@ export class CaveDecorationGenerator {
     chunkZ: number,
     heightmapVals: ChunkDataCache3D,
     chunkHeight: CaveDataView
-  ) {
-    const decorations: any = [];
+  ):ClusterCell[] {
+    const decorations: ClusterCell[] = [];
     const chunkSize = this.chunkSize;
     const chunkEndX = chunkX + chunkSize;
     const chunkEndZ = chunkZ + chunkSize;
@@ -150,7 +147,7 @@ export class CaveDecorationGenerator {
     chunkStartY: number,
     chunkStartZ: number,
     chunkHeight: number,
-    decorations: any[]
+    decorations: ClusterCell[]
   ) {
     const chunkEndY = chunkStartY + chunkHeight;
 
@@ -163,7 +160,7 @@ export class CaveDecorationGenerator {
           decoration.x - chunkStartX,
           decoration.y - chunkStartY,
           decoration.z - chunkStartZ,
-          decoration.NI
+          decoration.blockId
         );
       }
     }
@@ -177,7 +174,7 @@ export class CaveDecorationGenerator {
     chunkStartZ: number,
     chunkEndZ: number,
     caveDataProvider: CaveDataProvider,
-    decorations: any[]
+    decorations: ClusterCell[]
   ) {
     const caveIntervals = caveDataProvider.getDecoratableCaves(x, z);
 
@@ -228,7 +225,7 @@ export class CaveDecorationGenerator {
       clusterCells
     );
 
-    if (clusterCells.length < selectedConfig.oI) {
+    if (clusterCells.length < selectedConfig.minClusterCells) {
       return;
     }
 
@@ -250,14 +247,10 @@ export class CaveDecorationGenerator {
     z: number,
     config: any,
     caveDataProvider: CaveDataProvider,
-    rng: any,
-    clusterCells: any[]
+    rng: SeededRandom,
+    clusterCells: ClusterCell[]
   ) {
-    const {
-      clusterBoxSize,
-      yI,
-      anchorOptions
-    } = config;
+    const { clusterBoxSize, yI, anchorOptions } = config;
 
     const halfBox = clusterBoxSize >> 1;
     const startX = x - halfBox;
@@ -277,14 +270,9 @@ export class CaveDecorationGenerator {
 
           const offsetIndex = Math.floor(offsetRoll * 8);
 
-          const cellX =
-            startX + offsetX * 2 + (offsetIndex & 1);
-
-          const cellY =
-            startY + offsetY * 2 + ((offsetIndex >> 1) & 1);
-
-          const cellZ =
-            startZ + offsetZ * 2 + ((offsetIndex >> 2) & 1);
+          const cellX = startX + offsetX * 2 + (offsetIndex & 1);
+          const cellY = startY + offsetY * 2 + ((offsetIndex >> 1) & 1);
+          const cellZ = startZ + offsetZ * 2 + ((offsetIndex >> 2) & 1);
 
           if (!isInsideDecoratableCave(cellX, cellY, cellZ, caveDataProvider)) {
             continue;

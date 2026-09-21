@@ -13,7 +13,7 @@ export class ChunkDataCache3D {
   outerSparseArray: Sparse3DArray;
 
   constructor(
-    innerContiguousArray: ChunkArray3D, 
+    innerContiguousArray: ChunkArray3D,
     generator: FixedPointPrefabChunkHeightGenerator
   ) {
     this.innerContiguousArray = innerContiguousArray;
@@ -22,9 +22,9 @@ export class ChunkDataCache3D {
   }
 
   static create(
-    size: number, 
-    chunkBottomLeft: Vec2, 
-    dimension3: HeightField, 
+    size: number,
+    chunkBottomLeft: Vec2,
+    dimension3: HeightField,
     generator: FixedPointPrefabChunkHeightGenerator
   ) {
     const innerArray = new ChunkArray3D(size, chunkBottomLeft, dimension3);
@@ -40,7 +40,7 @@ export class ChunkDataCache3D {
 
   getOrGenerate(x: number, y: number, z: number) {
     if (this.innerContiguousArray.isInBounds(x, y)) {
-      return this.innerContiguousArray.get(x, y, z);
+      return this.innerContiguousArray.get(x, y, z)!;
     }
 
     const cachedValue = this.outerSparseArray.get(x, y, z);
@@ -49,7 +49,7 @@ export class ChunkDataCache3D {
     }
 
     this.generator.generateAndSet(x, y, this.outerSparseArray);
-    return this.outerSparseArray.get(x, y, z);
+    return this.outerSparseArray.get(x, y, z)!;
   }
 
   viewJustInnerChunk() {

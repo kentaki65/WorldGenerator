@@ -80,7 +80,7 @@ interface ChunkColumInfo {
 
 interface GeneratorOptions {
   OI: boolean;
-  JI: any;
+  biomeEntries: any;
   MI: OreConfig[];
   WI: {
     UI?: string;
@@ -143,7 +143,7 @@ export class WorldGenerator {
       seed,
       chunkSize,
       blockMetadata,
-      options?.WI?.UI ?? "Lava"
+      options?.WI?.UI as BlockName ?? "Lava"
     );
 
     const oreGenerator = new OreGenerator(
@@ -163,7 +163,7 @@ export class WorldGenerator {
       }
     };
 
-    const customBiomes = options?.JI ?? null;
+    const customBiomes = options?.biomeEntries ?? null;
     const biomeEntries = customBiomes !== null ? function (customBiomeDefs, IH) {
       let { chunkSize, blockMetadata, worldGenerator, seed, biomeOpts } = IH;
 
@@ -400,6 +400,7 @@ export class WorldGenerator {
       blockMetadata,
       chunkSize,
       seed,
+      //config
       options?.WI?.BI ?? null
     );
 
@@ -482,7 +483,7 @@ export class WorldGenerator {
   getInfoForChunkColumn(
     chunkStartX: number,
     chunkStartZ: number
-  ) {
+  ): ChunkColumInfo {
     if (
       this.mostRecentlyAccessedChunkColumn &&
       this.mostRecentlyAccessedChunkColumnPos[0] === chunkStartX &&
@@ -513,7 +514,6 @@ export class WorldGenerator {
     const chunkPrefabs = this.prefabGenerator.getPrefabsForChunk(chunkStartX, chunkStartZ, heightmapVals, closestBiomes, caveHeightmapVals, nearestFixedPrefabInfoForChunk);
     //謎だよ
     const treesForChunk = this.treeGenerator.getTreesForChunk(chunkStartX, chunkStartZ, heightmapVals, closestBiomes, caveHeightmapVals, chunkPrefabs, nearestFixedPrefabInfoForChunk);
-    //は?
     const chunkOres = closestBiomes.getOrGenerate(
       chunkStartX + Math.floor(this.chunkSize / 2),
       chunkStartZ + Math.floor(this.chunkSize / 2)

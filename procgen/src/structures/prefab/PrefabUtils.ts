@@ -1,6 +1,8 @@
+import { PrefabPlacement } from "@/core/types.js";
+
 //gE
 export function worldToPrefabX(
-  prefabPlacement: any, 
+  prefabPlacement: PrefabPlacement, 
   worldX: number
 ) {
   let localX = worldX - prefabPlacement.anchorX;
@@ -14,7 +16,7 @@ export function worldToPrefabX(
 
 //yE
 export function worldToPrefabZ(
-  prefabPlacement: any, 
+  prefabPlacement: PrefabPlacement, 
   worldZ: number
 ) {
   let localZ = worldZ - prefabPlacement.anchorZ;
@@ -28,7 +30,7 @@ export function worldToPrefabZ(
 
 //OE
 export function prefabToWorldX(
-  prefabPlacement: any,
+  prefabPlacement: PrefabPlacement,
   localX: number,
   localZ: number
 ) {
@@ -43,7 +45,7 @@ export function prefabToWorldX(
 
 //kR
 export function prefabToWorldZ(
-  prefabPlacement: any,
+  prefabPlacement: PrefabPlacement,
   localX: number,
   localZ: number
 ) {

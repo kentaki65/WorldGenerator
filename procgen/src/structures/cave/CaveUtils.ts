@@ -1,6 +1,7 @@
 import { CaveField, OUT_OF_RUNGE_NUMBER } from "@/core/constants.js";
 import { BlockMetadata, BlockName, CaveInterval, ClusterConfig, ClusterSettingsResult, Vec3 } from "@/core/types.js";
 import { CaveDataProvider } from "./CaveDataProvider.js";
+import { CaveDataView } from "./CaveDataViewer.js";
 
 interface BlockOffsetOptions {
   includeDown: boolean;
@@ -61,7 +62,7 @@ export function mergeCaveIntervals(
 export function collectCaveIntervals(
   x: number,
   z: number,
-  caveHeightmapVals: any,
+  caveHeightmapVals: CaveDataView,
   skipSolidCaveTypes: boolean,
   intervals: CaveInterval[]
 ): void {
@@ -91,7 +92,7 @@ export function collectCaveIntervals(
 export function getCaveIntervals(
   x: number,
   z: number,
-  caveHeightmapVals: any,
+  caveHeightmapVals: CaveDataView,
   skipSolidCaveTypes: boolean
 ): CaveInterval[] {
   const intervals: CaveInterval[] = [];

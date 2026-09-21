@@ -14,13 +14,25 @@ import { multiplyByChunkSize, normalizeVector2 } from "@/utils/MathHelper.js";
 import { SeededRandom } from "@/noise/SeededRandom.js";
 import { ChunkDataCache3D } from "@/data/cache/ChunkDataCache3D.js";
 
+export interface SpaghettiCaveMetadata {
+  caveType: number;
+  caveEdgeNoiseGenerator: SimpleOctavesNoise;
+  caveHeightNoiseGenerator: ThresholdOctaveNoise;
+  caveHeightThreshold: CaveHeightThreshold;
+  caveHeightMax: number;
+  caveHeightPercentageUpperBound: number;
+  caveXZPerturbNoiseGenerator: SimpleOctavesNoise;
+  caveYPerturbNoiseGenerator: SimpleOctavesNoise;
+  caveCentreY: number;
+}
+
 interface PitCaveMetadata {
   caveType: number;
   wallType: number | null;
   ceilingType: number | null;
   pitCeilingThicknessDistribution: RandomIntRange | null;
-  pitPointGenerator: any;
-  pitXZPerturbNoiseGenerator: any;
+  pitPointGenerator: FeaturePointGenerator;
+  pitXZPerturbNoiseGenerator: SimpleOctavesNoise;
   pitWidthDistribution: RandomIntRange;
   pitLengthDistribution: RandomIntRange;
   pitFloorYDistribution: RandomIntRange;
@@ -28,6 +40,71 @@ interface PitCaveMetadata {
   pitFloorYPerturbNoiseGenerator: SimpleOctavesNoise;
   pitHeightPerturbNoiseGenerator: SimpleOctavesNoise | null;
   pitMidpointYPerturbNoiseGenerator: SimpleOctavesNoise;
+}
+
+interface RavineCaveMetadata {
+  caveType: number;
+  ravinePointGenerator: FeaturePointGenerator;
+  ravineXZPerturbNoiseGenerator: SimpleOctavesNoise;
+  ravineYPerturbNoiseGenerator: SimpleOctavesNoise;
+  ravineWidthDistribution: RandomIntRange;
+  ravineLengthDistribution: RandomIntRange;
+  ravineFloorYDistribution: RandomIntRange;
+  ravineHeightDistribution: RandomIntRange;
+  ravineXZDirectionDistribution: RandomRange;
+}
+
+interface SphereCaveMetadata {
+  caveType: number;
+  spherePointGenerator: FeaturePointGenerator;
+  sphereXZPerturbNoiseGenerator: SimpleOctavesNoise;
+  sphereRadiusDistribution: RandomIntRange;
+  sphereCentreYDistribution: RandomIntRange;
+}
+
+export type PitCaveMetadataForChunk = {
+  caveType: number;
+  wallType: number | null;
+  ceilingType: number | null;
+  pitCeilingThickness: number;
+  pitMinX: number;
+  pitMaxX: number;
+  pitMinZ: number;
+  pitMaxZ: number;
+  pitFloorY: number;
+  pitHeight: number;
+  pitXZPerturbNoiseGenerator: SimpleOctavesNoise;
+  pitFloorYPerturbNoiseGenerator: SimpleOctavesNoise;
+  pitHeightPerturbNoiseGenerator: SimpleOctavesNoise | null;
+  pitMidpointYPerturbNoiseGenerator: SimpleOctavesNoise;
+};
+
+export type RavineCaveMetadataForChunk = {
+  caveType: number;
+  ravineCentre: Vec2;
+  ravineWidth: number;
+  ravineLength: number;
+  ravineFloorY: number;
+  ravineHeight: number;
+  ravineDirection: Vec2;
+  ravineXZPerturbNoiseGenerator: SimpleOctavesNoise;
+  ravineYPerturbNoiseGenerator: SimpleOctavesNoise;
+};
+
+export type SphereCaveMetadataForChunk = {
+  caveType: number;
+  sphereRadiusSquared: number;
+  sphereCentreX: number;
+  sphereCentreY: number;
+  sphereCentreZ: number;
+  sphereXZPerturbNoiseGenerator: SimpleOctavesNoise;
+};
+
+interface CaveMetadataForChunk {
+  spaghettiCaveMetadataForChunk: SpaghettiCaveMetadata[];
+  pitCaveMetadataForChunk: PitCaveMetadataForChunk[];
+  ravineCaveMetadataForChunk: RavineCaveMetadataForChunk[];
+  sphereCaveMetadataForChunk: SphereCaveMetadataForChunk[];
 }
 
 export type CaveTypeBlockId = BlockId | WeightedDistribution<number>;
@@ -53,14 +130,14 @@ const cachePool = new PartitionedTTLCache({
 
 export class CaveMetadataManager {
   seed: Seed;
-  spaghettiCaveMetadata: any;
-  pitCaveMetadata: any;
-  ravineCaveMetadata: any;
-  sphereCaveMetadata: any;
-  numCaveTypes: any;
+  spaghettiCaveMetadata: SpaghettiCaveMetadata[];
+  pitCaveMetadata: PitCaveMetadata[];
+  ravineCaveMetadata: RavineCaveMetadata[];
+  sphereCaveMetadata: SphereCaveMetadata[];
+  numCaveTypes: number;
   caveTypeToBlockId: CaveTypeBlockId[];
-  caveTypePrioritization: any;
-  perChunkCache: PartitionTTLCache;
+  caveTypePrioritization: number[];
+  perChunkCache: PartitionTTLCache<CaveMetadataForChunk>;
 
   constructor(
     seed: Seed,
@@ -69,18 +146,12 @@ export class CaveMetadataManager {
     blockName: BlockName
   ) {
     this.seed = seed;
-    this.spaghettiCaveMetadata = undefined;
-    this.pitCaveMetadata = undefined;
-    this.ravineCaveMetadata = undefined;
-    this.sphereCaveMetadata = undefined;
-    this.numCaveTypes = undefined;
-    this.caveTypePrioritization = undefined;
     this.perChunkCache = cachePool.partitionTTLCache();
 
     let nextCaveType = 0;
 
     const caveTypeToBlockId: CaveTypeBlockId[] = [];
-    const caveTypePriority: any = [];
+    const caveTypePriority: number[] = [];
 
     {
       const { spaghettiCaveMetadata, nextCaveType: updatedNextCaveType }
@@ -494,7 +565,7 @@ export class CaveMetadataManager {
     }
 
     type CaveType = {
-      caveType: number, 
+      caveType: number,
       priority: number
     }
 
@@ -506,8 +577,8 @@ export class CaveMetadataManager {
   }
 
   getOrCreateCaveGeneratorForChunk(
-    chunkX: number, 
-    chunkZ: number, 
+    chunkX: number,
+    chunkZ: number,
     heightmapVals: ChunkDataCache3D
   ) {
     const caveMetadataForChunk = this.getOrBuildCaveMetadataForChunk(chunkX, chunkZ);
@@ -540,16 +611,16 @@ export class CaveMetadataManager {
     return caveMetadataForChunk;
   }
 
-  buildPitCaveMetadataForChunk(chunkCoords: Vec2) {
-    const pitCaveMetadataForChunk = [];
+  buildPitCaveMetadataForChunk(chunkCoords: Vec2): PitCaveMetadataForChunk[] {
+    const pitCaveMetadataForChunk: PitCaveMetadataForChunk[] = [];
     for (let pitTypeIndex = 0; pitTypeIndex < this.pitCaveMetadata.length; pitTypeIndex++) {
-      const pitType = this.pitCaveMetadata[pitTypeIndex];
+      const pitType = this.pitCaveMetadata[pitTypeIndex]!;
       const surroundingPits = pitType.pitPointGenerator.getSurroundingFeatures(chunkCoords[0], chunkCoords[1]);
 
       for (const pitCentre of surroundingPits) {
         var ceilingThicknessDistribution;
-        const pitCentreX = pitCentre[0];
-        const pitCentreZ = pitCentre[1];
+        const pitCentreX = pitCentre[0]!;
+        const pitCentreZ = pitCentre[1]!;
         const rng = new SeededRandom(`pit${pitCentreX}|${pitCentreZ}|${pitTypeIndex}${this.seed}`);
 
         const halfWidth = pitType.pitWidthDistribution.sample(rng) >> 1;
@@ -587,11 +658,11 @@ export class CaveMetadataManager {
     return pitCaveMetadataForChunk;
   }
 
-  buildRavineCaveMetadataForChunk(chunkCoords: Vec2) {
-    const ravineCaveMetadataForChunk = [];
+  buildRavineCaveMetadataForChunk(chunkCoords: Vec2): RavineCaveMetadataForChunk[] {
+    const ravineCaveMetadataForChunk: RavineCaveMetadataForChunk[] = [];
     for (let ravineTypeIndex = 0; ravineTypeIndex < this.ravineCaveMetadata.length; ravineTypeIndex++) {
-      const ravineType = this.ravineCaveMetadata[ravineTypeIndex];
-      const surroundingRavines = ravineType.ravinePointGenerator.getSurroundingFeatures(chunkCoords[0], chunkCoords[1]);
+      const ravineType = this.ravineCaveMetadata[ravineTypeIndex]!;
+      const surroundingRavines: Vec2[] = ravineType.ravinePointGenerator.getSurroundingFeatures(chunkCoords[0], chunkCoords[1]);
 
       for (const ravineCentre of surroundingRavines) {
         const ravineCentreX = ravineCentre[0];
@@ -607,6 +678,7 @@ export class CaveMetadataManager {
           ravineType.ravineXZDirectionDistribution.sample(rng),
           ravineType.ravineXZDirectionDistribution.sample(rng)
         ];
+        
         normalizeVector2(ravineDirection);
 
         ravineCaveMetadataForChunk.push({
@@ -625,15 +697,15 @@ export class CaveMetadataManager {
     return ravineCaveMetadataForChunk;
   }
 
-  buildSphereCaveMetadataForChunk(chunkCoords: Vec2) {
-    const sphereCaveMetadataForChunk = [];
+  buildSphereCaveMetadataForChunk(chunkCoords: Vec2): SphereCaveMetadataForChunk[] {
+    const sphereCaveMetadataForChunk: SphereCaveMetadataForChunk[] = [];
     for (let sphereTypeIndex = 0; sphereTypeIndex < this.sphereCaveMetadata.length; sphereTypeIndex++) {
-      const sphereType = this.sphereCaveMetadata[sphereTypeIndex];
+      const sphereType = this.sphereCaveMetadata[sphereTypeIndex]!;
       const surroundingSpheres = sphereType.spherePointGenerator.getSurroundingFeatures(chunkCoords[0], chunkCoords[1]);
 
       for (const sphereCentre of surroundingSpheres) {
-        const sphereCentreX = sphereCentre[0];
-        const sphereCentreZ = sphereCentre[1];
+        const sphereCentreX = sphereCentre[0]!;
+        const sphereCentreZ = sphereCentre[1]!;
         const rng = new SeededRandom(`sph${sphereCentreX}|${sphereCentreZ}|${sphereTypeIndex}${this.seed}`);
 
         const sphereRadius = sphereType.sphereRadiusDistribution.sample(rng);
