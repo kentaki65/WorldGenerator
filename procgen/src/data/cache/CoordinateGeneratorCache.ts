@@ -1,6 +1,10 @@
 //uH
+interface CoordinateGenerator {
+  generate(x: number, y: number): number;
+}
+
 export class CoordinateGeneratorCache {
-  generator: any;
+  generator: CoordinateGenerator;
   cache: Map<number, Map<number, number>>;
 
   constructor(generator: any) {

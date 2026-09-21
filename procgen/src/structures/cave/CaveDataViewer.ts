@@ -2,16 +2,17 @@
 
 import { CaveField } from "@/core/constants.js";
 import { BlockId, NumCaveTypes } from "@/core/types.js";
+import { CaveTypeBlockId } from "./CaveMetadataManager.js";
 
 class CaveDataViewBase {
   numCaveTypes: NumCaveTypes;
-  caveTypeToBlockIds: BlockId[];
+  caveTypeToBlockIds: CaveTypeBlockId[];
   caveTypePrioritization: any;
   chunkSize: number;
 
   constructor(
     numCaveTypes: NumCaveTypes,
-    caveTypeToBlockIds: BlockId[],
+    caveTypeToBlockIds: CaveTypeBlockId[],
     caveTypePrioritization: any,
     chunkSize: number,
   ) {
@@ -27,7 +28,7 @@ export class CaveDataView extends CaveDataViewBase {
 
   constructor(
     numCaveTypes: NumCaveTypes,
-    caveTypeToBlockIds: BlockId[],
+    caveTypeToBlockIds: CaveTypeBlockId[],
     caveTypePrioritization: any,
     chunkSize: number,
     data: any
@@ -56,7 +57,7 @@ export class InnerChunkCaveDataView extends CaveDataViewBase {
 
   constructor(
     numCaveTypes: NumCaveTypes,
-    caveTypeToBlockIds: BlockId[],
+    caveTypeToBlockIds: CaveTypeBlockId[],
     caveTypePrioritization: any,
     chunkSize: number,
     data: any

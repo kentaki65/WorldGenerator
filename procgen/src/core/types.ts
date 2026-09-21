@@ -3475,11 +3475,22 @@ export interface GeneratedPrefabPlacement extends PrefabPlacement {
   decodedPrefabSchematic: any;
 }
 
-export interface ClusterSettings {
-  minY: number;
-  maxY: number;
-  shallowClusterY: number;
-  deepClusterY: number;
+export interface ClusterConfig {
+  blockName: BlockName;
+
+  includeDown: boolean;
+  includeSides: boolean;
+  includeUp: boolean;
+
+  spawnChance: number;
+  minClusterCells: number;
+  minChance: number;
+
+  depthSettings?: {
+    maxChance: number;
+    shallowClusterY: number;
+    deepClusterY: number;
+  };
 }
 
 export interface ClusterSettingsResult {
@@ -3491,8 +3502,8 @@ export interface ClusterSettingsResult {
   clusterBoxSize: number;
   spawnChance: number;
   minClusterCells: number;
-  mE: number;
-  ZI?: number;
+  minChance: number;
+  maxChance?: number;
   shallowClusterY?: number;
   deepClusterY?: number;
 }

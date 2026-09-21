@@ -10,7 +10,7 @@ export class Sparse3DArray {
     return this.array[x]?.[y]?.[z];
   }
 
-  set(x: number, y: number, z: number, value: any): void {
+  set(x: number, y: number, z: number, value: number): void {
     if (!this.array[x]) {
       this.array[x] = [];
     }

@@ -65,7 +65,7 @@ export class PrefabGenerator {
       [blockMetadata["Chest|meta|rot2"].id]: blockMetadata["Loot Chest|meta|rot2"].id,
       [blockMetadata["Chest|meta|rot3"].id]: blockMetadata["Loot Chest|meta|rot3"].id,
       [blockMetadata["Chest|meta|rot4"].id]: blockMetadata["Loot Chest|meta|rot4"].id
-    }, "number");
+    });
 
     const mobTypeToSpawnerBlockId = {} as Record<CaveMobNames, BlockId>;
 

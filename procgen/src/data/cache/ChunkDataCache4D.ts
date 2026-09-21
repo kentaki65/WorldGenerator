@@ -3,21 +3,29 @@ import { Sparse4DArray } from "../array/Sparse4DArray.js";
 import { ChunkArray4D } from "../array/ChunkArray4D.js";
 import { emptyArray, HeightField } from "@/core/constants.js";
 import { CombinedArray4D } from "../array/CombinedArray4D.js";
+import { CaveGeneratorManager } from "@/structures/cave/CaveGeneratorManager.js";
 
 //型修正必要
 export class ChunkDataCache4D {
   outerSparseArray: Sparse4DArray;
-  innerContiguousArray: any;
-  generator: any;
+  innerContiguousArray: ChunkArray4D;
+  generator: CaveGeneratorManager;
 
-  constructor(innerContiguousArray: any, generator: any) {
+  constructor(innerContiguousArray: ChunkArray4D, generator: CaveGeneratorManager) {
     this.innerContiguousArray = innerContiguousArray;
     this.generator = generator;
     this.outerSparseArray = new Sparse4DArray();
   }
 
-  static create(size: number, chunkBottomLeft: Vec2, dimension3: number, dimension4: HeightField, generator: any) {
-    const innerArray = new ChunkArray4D(size, chunkBottomLeft, dimension3, dimension4);
+  static create(
+    size: number,
+    chunkBottomLeft: Vec2,
+    numCaveTypes: number,
+    dimension4: HeightField,
+    generator: CaveGeneratorManager
+  ) {
+    const innerArray = new ChunkArray4D(size, chunkBottomLeft, numCaveTypes, dimension4);
+
     for (let x = chunkBottomLeft[0]; x < chunkBottomLeft[0] + size; x++) {
       for (let y = chunkBottomLeft[1]; y < chunkBottomLeft[1] + size; y++) {
         generator.generateAndSet(x, y, innerArray);
@@ -25,17 +33,15 @@ export class ChunkDataCache4D {
     }
     return new ChunkDataCache4D(innerArray, generator);
   }
-  
+
   getOrGenerate(x: number, y: number, z: number, d: number) {
     if (this.innerContiguousArray.isInBounds(x, y)) {
       return this.innerContiguousArray.get(x, y, z, d);
     }
-
-    {
-      const value = this.outerSparseArray.get(x, y, z, d);
-      if (value !== undefined) {
-        return value;
-      }
+    
+    const value = this.outerSparseArray.get(x, y, z, d);
+    if (value !== undefined) {
+      return value;
     }
 
     this.generator.generateAndSet(x, y, this.outerSparseArray);

@@ -10,7 +10,7 @@ import { CaveManager } from "@/structures/cave/CaveManager.js";
 import { CaveDecorationGenerator } from "@/structures/cave/CaveDecorationGenerator.js";
 import { CaveDataView } from "@/structures/cave/CaveDataViewer.js";
 import { FixedPointPrefabManager } from "@/structures/prefab/FixedPointPrefabManager.js";
-import { BlockMetadata, PrefabInstance, TreePlacement } from "@/core/types.js";
+import { BlockMetadata, PrefabInstance, Seed, TreePlacement } from "@/core/types.js";
 import { SeededRandom } from "@/noise/SeededRandom.js";
 import { squaredDistanceToPoint } from "@/utils/MathHelper.js";
 
@@ -44,7 +44,7 @@ interface FillChunkResult {
 
 export class ChunkGenerator {
   prefabGenerator: PrefabGenerator;
-  seed: string;
+  seed: Seed;
   chunkSize: number;
   biomeSelector: BiomeSelector;
   treeGenerator: TreeGenerator;
@@ -66,7 +66,7 @@ export class ChunkGenerator {
     blockMetadata: BlockMetadata,
     oreGenerator: OreGenerator,
     baseBiome: Biome,
-    seed: string
+    seed: Seed
   ) {
     this.prefabGenerator = prefabGenerator;
     this.seed = seed;

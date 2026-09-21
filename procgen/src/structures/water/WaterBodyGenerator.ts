@@ -1,5 +1,8 @@
+import { BiomeSelector } from "@/biome/BiomeSelector.js";
 import { Seed, Vec2 } from "@/core/types.js";
 import { PartitionedTTLCache } from "@/data/cache/PartitionedTTLCache.js";
+import { PartitionTTLCache } from "@/data/cache/PartitionTTLCache.js";
+import { NoWaterHeightmap } from "@/generator/NoWaterHeightmap.js";
 import { SeededRandom } from "@/noise/SeededRandom.js";
 import { SimpleOctavesNoise } from "@/noise/SimpleOctaveNoise.js";
 import { getClosestPointOnSegment, getDistance, getTotalAmplitude } from "@/utils/MathHelper.js";
@@ -65,8 +68,8 @@ class LakeInfo {
 }
 
 export class WaterBodyGenerator {
-  biomeSelector: any;
-  noWaterHeightmapGenerator: any;
+  biomeSelector: BiomeSelector;
+  noWaterHeightmapGenerator: NoWaterHeightmap;
   needOutsideWaterBodyDist: number;
   needsOutsideDist: boolean;
   gridSize: number;
@@ -78,11 +81,11 @@ export class WaterBodyGenerator {
   lakeRadiusNoiseModifier: SimpleOctavesNoise;
   lakeRadiusNoiseAmplitude: number;
   lastReadInfo: LastReadInfo;
-  waterBodyInfos: any;
+  waterBodyInfos: PartitionTTLCache<WaterBodyInfo>;
 
   constructor(
-    biomeSelector: any,
-    noWaterHeightmapGenerator: any,
+    biomeSelector: BiomeSelector,
+    noWaterHeightmapGenerator: NoWaterHeightmap,
     seed: Seed,
     maxFeatureRadius: number,
     needOutsideWaterBodyDist: number,

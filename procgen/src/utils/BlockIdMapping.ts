@@ -1,4 +1,4 @@
-import { BlockMetadata } from "@/core/types.js";
+import { BlockId, BlockMetadata, BlockName } from "@/core/types.js";
 
 const ROTATIONS = [0, 90, 180, 270];
 
@@ -8,9 +8,7 @@ export class BlockIdMappingManager {
   constructor(blockMetadata: BlockMetadata) {
     this.blockIdMappings = {};
 
-    const blockIds = new Set(
-      Object.keys(blockMetadata).map((key) => blockMetadata[key].id)
-    );
+    const blockIds = new Set<BlockId>((Object.keys(blockMetadata) as BlockName[]).map((key) => blockMetadata[key].id));
     blockIds.add(0);
 
     const maxBlockId = Math.max(...blockIds);
@@ -62,6 +60,7 @@ export class BlockIdMappingManager {
       rotationMapping[3] = temp!;
     }
 
+    //metaが必要!!!!
     for (const blockName in blockMetadata) {
       const { id: blockId, meta } = blockMetadata[blockName];
       const { rot: metaRotation, rootName, metaStr } = meta;

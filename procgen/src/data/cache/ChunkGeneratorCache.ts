@@ -1,20 +1,26 @@
 import { Vec2 } from "@/core/types.js";
 import { ChunkArray2DWithPadding } from "../array/ChunkArray2DWithPadding.js";
+import { BiomeSelector, BiomeGenerateResult } from "@/biome/BiomeSelector.js";
 
-//型の修正必要
-//dH
 export class ChunkGeneratorCache {
-  innerContiguousArray: any;
-  generator: any;
-  outerSparseArray: any;
+  innerContiguousArray: ChunkArray2DWithPadding;
+  generator: BiomeSelector;
+  outerSparseArray: BiomeGenerateResult[][][];
 
-  constructor(innerContiguousArray: any, generator: any) {
+  constructor(
+    innerContiguousArray: ChunkArray2DWithPadding,
+    generator: BiomeSelector
+  ) {
     this.innerContiguousArray = innerContiguousArray;
     this.generator = generator;
     this.outerSparseArray = [];
   }
 
-  static create(size: number, chunkBottomLeft: Vec2, generator: any) {
+  static create(
+    size: number,
+    chunkBottomLeft: Vec2,
+    generator: BiomeSelector
+  ): ChunkGeneratorCache {
     const array = new ChunkArray2DWithPadding(size, chunkBottomLeft);
 
     for (let x = chunkBottomLeft[0]; x < chunkBottomLeft[0] + size; x++) {
@@ -27,17 +33,18 @@ export class ChunkGeneratorCache {
     return new ChunkGeneratorCache(array, generator);
   }
 
-  getOrGenerate(x: number, y: number) {
+  getOrGenerate(x: number, y: number): BiomeGenerateResult[] {
     if (this.innerContiguousArray.isInBounds(x, y)) {
       return this.innerContiguousArray.get(x, y);
     }
+    
     let value = this.outerSparseArray[x]?.[y];
     if (value === undefined) {
       value = this.generator.generate(x, y);
       if (!this.outerSparseArray[x]) {
         this.outerSparseArray[x] = [];
       }
-      this.outerSparseArray[x][y] = value;
+      this.outerSparseArray[x]![y] = value;
     }
     return value;
   }

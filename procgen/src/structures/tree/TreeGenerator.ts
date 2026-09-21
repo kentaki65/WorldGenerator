@@ -1,12 +1,13 @@
 import { CanopyType, TreeType, CanopyBlockPlacement, CanopyShape, CanopyLevel, HeightField, OUT_OF_RUNGE_NUMBER } from "@/core/constants.js";
-import { BlockId } from "@/core/index.js";
-import { BlockMetadata, ChunkArray, PrefabCenter, Seed, TreePlacement } from "@/core/types.js";
+import { BlockId, BlockMetadata, ChunkArray, PrefabCenter, Seed, TreePlacement } from "@/core/types.js";
 import { ChunkArray2D } from "@/data/array/ChunkArray2D.js";
 import { PointsGenerator } from "@/generator/PointsGenerator.js";
 import { CaveManager } from "../cave/CaveManager.js";
 import { PrefabGenerator } from "../prefab/PrefabGenerator.js";
 import { FixedPointPrefabManager } from "../prefab/FixedPointPrefabManager.js";
 import { SeededRandom } from "@/noise/SeededRandom.js";
+import { BiomeSelector } from "@/biome/BiomeSelector.js";
+import { ChunkGeneratorCache } from "@/data/cache/ChunkGeneratorCache.js";
 
 type GeneratorFn = (dx: number, dz: number) => CanopyBlockPlacement;
 
@@ -15,16 +16,6 @@ interface TreeSettings {
   biomeSelector: any;
 }
 
-//getBiome(point[0], point[1]).biome.treeMinDist
-//biomeについてやったときここ定義しよう
-
-interface BiomeAccessor {
-  getBiome(x: number, z: number): {
-    biome: {
-      treeMinDist: number;
-    }
-  }
-}
 interface TreeBlock {
   x: number;
   y: number;
@@ -95,7 +86,7 @@ export class TreeGenerator {
 
   constructor(
     settings: TreeSettings,
-    biomeAccessor: BiomeAccessor,
+    biomeAccessor: BiomeSelector,
     chunkSize: number,
     seed: Seed,
     blockMetadata: BlockMetadata
@@ -344,13 +335,7 @@ export class TreeGenerator {
     }
 
     this.treePointGen = new PointsGenerator(
-      "tree",
-      6,
-      true,
-      false,
-      seed,
-      300,
-      chunkSize,
+      "tree", 6, true, false, seed, 300, chunkSize,
       {
         func: point => biomeAccessor.getBiome(point[0], point[1]).biome.treeMinDist || maxTreeMinDist,
         min: minTreeMinDist,
@@ -365,11 +350,11 @@ export class TreeGenerator {
     chunkStartX: number,
     chunkStartZ: number,
     heightmapVals: any,
-    biomeGrid: any,
+    biomeGrid: ChunkGeneratorCache,
     caveData: any,
     placedPrefabs: PrefabCenter[],
     fixedPrefabInfo: any,
-  ) {
+  ): TreePlacement[] {
     const trees = [];
     for (let worldX = chunkStartX - this.maxTreeRadius; worldX < chunkStartX + this.chunkSize + this.maxTreeRadius; worldX++) {
       for (let worldZ = chunkStartZ - this.maxTreeRadius; worldZ < chunkStartZ + this.chunkSize + this.maxTreeRadius; worldZ++) {
@@ -763,10 +748,10 @@ export class TreeGenerator {
     const vineZ = treeZ + dz;
     if (!(vineX < chunkStartX) && !(vineX >= chunkEndX) && !(vineZ < chunkStartZ) && !(vineZ >= chunkEndZ)) {
       if (isTrunkBaseInChunkY) {
-        chunkArray.set(vineX - chunkStartX, trunkBase - chunkStartY, vineZ - chunkStartZ, vineBlockId);
+        chunkArray.set(vineX - chunkStartX, trunkBase - chunkStartY, vineZ - chunkStartZ, vineBlockId!);
       }
       for (let y = trunkStartY; y < canopyBottomY; y++) {
-        chunkArray.set(vineX - chunkStartX, y - chunkStartY, vineZ - chunkStartZ, vineBlockId);
+        chunkArray.set(vineX - chunkStartX, y - chunkStartY, vineZ - chunkStartZ, vineBlockId!);
       }
     }
   }

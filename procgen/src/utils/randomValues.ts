@@ -13,34 +13,7 @@ export const mirrorDistribution = new WeightedDistribution([
 ]);
 
 export const mobNamePrefixDistribution = new WeightedDistribution(
-  [
-    "Powerful",
-    "Legendary",
-    "Majestic",
-    "Fearless",
-    "Celestial",
-    "Mythic",
-    "Epic",
-    "Ethereal",
-    "Omniscient",
-    "Omnipotent",
-    "Arcane",
-    "Enigmatic",
-    "Formidable",
-    "Indomitable",
-    "Luminous",
-    "Ferocious",
-    "Astral",
-    "Unyielding",
-    "Celestine",
-    "Ascendant",
-    "Otherworldly",
-    "Runic",
-    "Fabled",
-    "Primordial",
-    "Cosmic",
-    "Enkindled",
-  ].map(value => ({
+  ["Powerful","Legendary","Majestic","Fearless","Celestial","Mythic","Epic","Ethereal","Omniscient","Omnipotent","Arcane","Enigmatic","Formidable","Indomitable","Luminous","Ferocious","Astral","Unyielding","Celestine","Ascendant","Otherworldly","Runic","Fabled","Primordial","Cosmic","Enkindled",].map(value => ({
     value,
     weight: 1,
   }))

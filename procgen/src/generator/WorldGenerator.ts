@@ -2,10 +2,9 @@ import voxelCrunch from 'voxel-crunch';
 import MD5 from "md5.js";
 
 import { BiomeSelector } from "@/biome/BiomeSelector.js";
-import { BlockMetadata, Seed, Vec2 } from "@/core/types.js";
+import { BlockId, BlockMetadata, BlockName, GeneratedPrefabPlacement, Seed, TreePlacement, Vec2 } from "@/core/types.js";
 import { PartitionedTTLCache } from "@/data/cache/PartitionedTTLCache.js";
 import { CaveDecorationGenerator } from "@/structures/cave/CaveDecorationGenerator.js";
-import { CaveGenerator } from "@/structures/cave/CaveGenerator.js";
 import { FixedPointPrefabManager } from "@/structures/prefab/FixedPointPrefabManager.js";
 import { PrefabGenerator } from "@/structures/prefab/PrefabGenerator.js";
 import { TreeGenerator } from "@/structures/tree/TreeGenerator.js";
@@ -14,7 +13,7 @@ import { SimpleOctavesNoise } from "@/noise/SimpleOctaveNoise.js";
 import { WaterBodyGenerator } from "@/structures/water/WaterBodyGenerator.js";
 import { ChunkGenerator } from "./ChunkGenerator.js";
 import { PartitionTTLCache } from "@/data/cache/PartitionTTLCache.js";
-import { OreGenerator } from "@/structures/ore/oreGenerator.js";
+import { oreConfigs, OreGenerator } from "@/structures/ore/oreGenerator.js";
 import { createStoneFrequencyData } from "@/utils/createStoneFrequencyData.js";
 import { getBlockId } from "@/utils/utils.js";
 import { Desert } from "@/biome/Desert/Desert.js";
@@ -37,10 +36,57 @@ import { TallGrassPlains } from "@/biome/Plains/TallGrassPlains.js";
 import { MaplePlains } from "@/biome/Plains/MaplePlains.js";
 import { FrozenBadlandsPlains } from "@/biome/Plains/FrozenBadlandsPlains.js";
 import { FrozenBadlandsForest } from "@/biome/Forest/FrozenBadlandsForest.js";
-import { CaveLayer, FeatureHeight } from "@/core/constants.js";
-import { ChunkGeneratorCache } from '@/data/cache/ChunkGeneratorCache2D.js';
+import { CaveLayer, FeatureHeight, HeightField } from "@/core/constants.js";
+import { ChunkGeneratorCache } from '@/data/cache/ChunkGeneratorCache.js';
 import { HeightmapGenerator } from './HeightmapGenerator.js';
 import { ChunkDataCache3D } from '@/data/cache/ChunkDataCache3D.js';
+import { CaveManager } from '@/structures/cave/CaveManager.js';
+import { CustomBiome } from '@/biome/CustomBiome.js';
+import { ChunkArray2D } from '@/data/array/ChunkArray2D.js';
+import { CombinedArray3D } from '@/data/array/CombinedArray3D.js';
+import { InnerChunkCaveDataView } from '@/structures/cave/CaveDataViewer.js';
+
+interface OreConfig {
+  blockName: string;
+  minHeight: number;
+  maxHeight: number;
+  veinRadius: number;
+  placementChance: number;
+  minDistanceBetweenOres: number;
+}
+
+interface ChunkColumInfo {
+  biomeInfos: {
+    biomeIds: ChunkArray2D;
+    stoneTypeIds: ChunkArray2D;
+  };
+  heightmapVals: CombinedArray3D;
+  caveHeightmapVals: InnerChunkCaveDataView;
+  treesForChunk: TreePlacement[];
+  chunkPrefabs: GeneratedPrefabPlacement[];
+  chunkOres: Int32Array<ArrayBuffer>;
+  nearestFixedPrefabInfoForChunk: ChunkDataCache3D | null;
+  decodedFixedPointPrefabsForChunk: never[] | {
+    decodedPrefabSchematic: {};
+    bottomLeftX: number;
+    bottomLeftZ: number;
+    floorY: number;
+    ceilingY: number;
+    topRightX: number;
+    topRightZ: number;
+  }[]
+  caveDecorations: any;
+}
+
+interface GeneratorOptions {
+  OI: boolean;
+  JI: any;
+  MI: OreConfig[];
+  WI: {
+    UI?: string;
+    BI?: any;
+  };
+}
 
 let xR: PartitionedTTLCache | undefined;
 
@@ -51,7 +97,7 @@ export class WorldGenerator {
   maxPrefabGroundingRadius: number;
   treeGenerator: TreeGenerator;
   prefabGenerator: PrefabGenerator;
-  caveGenerator: CaveGenerator;
+  caveGenerator: CaveManager;
   caveDecorationGenerator: CaveDecorationGenerator;
   biomeSelector: BiomeSelector;
   fixedPointPrefabTracker: FixedPointPrefabManager;
@@ -61,7 +107,7 @@ export class WorldGenerator {
   needOutsideWaterDist: number;
   mostRecentlyAccessedChunkColumnPos: Vec2;
   mostRecentlyAccessedChunkColumn: any;
-  chunkColumnInfos: PartitionTTLCache;
+  chunkColumnInfos: PartitionTTLCache<ChunkColumInfo>;
   chunkGenerator: ChunkGenerator;
 
   constructor(
@@ -71,11 +117,9 @@ export class WorldGenerator {
     seed: Seed,
     useBiggerCache: boolean,
     fixedPointPrefabs: any,
-    cacheSizeMultiplier: number
+    cacheSizeMultiplier: number,
+    options: GeneratorOptions | null = null,
   ) {
-    var VH;
-    let options = arguments.length > 7 && arguments[7] !== undefined ? arguments[7] : null;
-
     this.chunkSize = chunkSize;
     this.maxTreeRadius = 3;
     this.prefabSize = 40;
@@ -95,15 +139,20 @@ export class WorldGenerator {
     }
 
     this.chunkColumnInfos = xR.partitionTTLCache();
-    this.caveGenerator = new CaveGenerator(
+    this.caveGenerator = new CaveManager(
       seed,
       chunkSize,
       blockMetadata,
-      (options === null || options === undefined ? undefined : options.WI.UI) ?? "Lava"
+      options?.WI?.UI ?? "Lava"
     );
 
-    const oreGenerator = new OreGenerator(blockMetadata, seed, chunkSize, options?.MI ?? dE);
-    
+    const oreGenerator = new OreGenerator(
+      blockMetadata,
+      seed,
+      chunkSize,
+      options?.MI ?? oreConfigs
+    );
+
     const biomeOptions = {
       chunkSize,
       blockMetadata,
@@ -115,29 +164,23 @@ export class WorldGenerator {
     };
 
     const customBiomes = options?.JI ?? null;
-    const biomeEntries = customBiomes !== null ? function (HH, IH) {
-      let {
-        chunkSize: EH,
-        blockMetadata: RH,
-        worldGenerator: hH,
-        seed: TH,
-        biomeOpts: sH
-      } = IH;
+    const biomeEntries = customBiomes !== null ? function (customBiomeDefs, IH) {
+      let { chunkSize, blockMetadata, worldGenerator, seed, biomeOpts } = IH;
 
-      if (HH.length === 0) {
+      if (customBiomeDefs.length === 0) {
         throw new Error("buildCustomBiomes requires at least one custom biome");
       }
 
-      return HH.map(HH => {
-        const customBiome = new gR(EH, RH, hH, TH, sH, HH);
-        const stoneTypes = HH.XI.map(HH => ({
-          stoneId: getBlockId(HH.blockName, RH),
-          frequency: HH.frequency
+      return customBiomeDefs.map(customBiomeDef => {
+        const customBiome = new CustomBiome(chunkSize, blockMetadata, worldGenerator, seed, biomeOpts, customBiomeDef);
+        const stoneTypes = customBiomeDef.XI.map(entry => ({
+          stoneId: getBlockId(entry.blockName, blockMetadata),
+          frequency: entry.frequency
         }));
 
         return {
           biome: customBiome,
-          frequency: HH.frequency,
+          frequency: customBiomeDef.frequency,
           altBiome: null,
           ...createStoneFrequencyData(stoneTypes)
         };
@@ -350,14 +393,14 @@ export class WorldGenerator {
       heightmapPerturbAmplitude,
       this.needOutsideWaterDist,
       useBiggerCache,
-      (VH = options?.OI) === null || VH === undefined || VH
+      options?.OI ?? true
     );
 
     this.caveDecorationGenerator = new CaveDecorationGenerator(
       blockMetadata,
       chunkSize,
       seed,
-      (options === null || options === undefined ? undefined : options.WI.BI) ?? null
+      options?.WI?.BI ?? null
     );
 
     this.chunkGenerator = new ChunkGenerator(
@@ -374,18 +417,18 @@ export class WorldGenerator {
 
   //chunkArray, chunkStartX, chunkStartY, chunkStartZ
   getChunk(
-    chunkArray: any, 
-    chunkStartX: number, 
-    chunkStartY: number, 
+    chunkArray: any,
+    chunkStartX: number,
+    chunkStartY: number,
     chunkStartZ: number
   ) {
     try {
       const { specialBlocks } = this.getChunkInternal(chunkArray, chunkStartX, chunkStartY, chunkStartZ);
 
       const encodedChunkData = voxelCrunch.encode(chunkArray.data);
-      const encodedString  = String.fromCharCode.apply(null, encodedChunkData);
+      const encodedString = String.fromCharCode.apply(null, encodedChunkData);
       const hashInput = {
-        a: encodedString ,
+        a: encodedString,
         b: JSON.stringify(specialBlocks)
       };
       const hashInputJson = JSON.stringify(hashInput);
@@ -402,9 +445,9 @@ export class WorldGenerator {
   }
 
   getChunkInternal(
-    chunkArray: any, 
-    chunkStartX: number, 
-    chunkStartY: number, 
+    chunkArray: any,
+    chunkStartX: number,
+    chunkStartY: number,
     chunkStartZ: number
   ) {
     const {
@@ -437,7 +480,7 @@ export class WorldGenerator {
   }
 
   getInfoForChunkColumn(
-    chunkStartX: number, 
+    chunkStartX: number,
     chunkStartZ: number
   ) {
     if (
@@ -468,11 +511,14 @@ export class WorldGenerator {
     const heightmapVals = this.getHeightMapVals(chunkStartX, chunkStartZ, closestBiomes, nearestFixedPrefabInfoForChunk);
     const caveHeightmapVals = this.caveGenerator.getCaveHeightmapVals(chunkStartX, chunkStartZ, heightmapVals);
     const chunkPrefabs = this.prefabGenerator.getPrefabsForChunk(chunkStartX, chunkStartZ, heightmapVals, closestBiomes, caveHeightmapVals, nearestFixedPrefabInfoForChunk);
+    //謎だよ
     const treesForChunk = this.treeGenerator.getTreesForChunk(chunkStartX, chunkStartZ, heightmapVals, closestBiomes, caveHeightmapVals, chunkPrefabs, nearestFixedPrefabInfoForChunk);
+    //は?
     const chunkOres = closestBiomes.getOrGenerate(
       chunkStartX + Math.floor(this.chunkSize / 2),
       chunkStartZ + Math.floor(this.chunkSize / 2)
     )[0].biome.oreGenerator.getOreBlocksForChunk(chunkStartX, chunkStartZ);
+
     const caveDecorations = this.caveDecorationGenerator.getDecorationsForChunkColumn(chunkStartX, chunkStartZ, heightmapVals, caveHeightmapVals);
 
     const chunkColumnInfo = {
@@ -496,16 +542,16 @@ export class WorldGenerator {
   }
 
   getClosestBiomesForChunk(
-    chunkStartX: number, 
+    chunkStartX: number,
     chunkStartZ: number
   ) {
     return ChunkGeneratorCache.create(this.chunkSize, [chunkStartX, chunkStartZ], this.biomeSelector);
   }
 
   getHeightMapVals(
-    chunkStartX: number, 
-    chunkStartZ: number, 
-    closestBiomes: any, 
+    chunkStartX: number,
+    chunkStartZ: number,
+    closestBiomes: any,
     nearestFixedPrefabInfoForChunk: any
   ) {
     const heightmapGenerator = new HeightmapGenerator(
@@ -516,6 +562,6 @@ export class WorldGenerator {
       this.waterBodyGenerator
     );
 
-    return ChunkDataCache3D.create(this.chunkSize, [chunkStartX, chunkStartZ], QI.NumFields, heightmapGenerator);
+    return ChunkDataCache3D.create(this.chunkSize, [chunkStartX, chunkStartZ], HeightField.NumFields, heightmapGenerator);
   }
 }

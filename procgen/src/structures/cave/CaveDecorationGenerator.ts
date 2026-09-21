@@ -1,9 +1,11 @@
-import { BlockMetadata, ChunkArray, ClusterSettings, Seed } from "@/core/types.js";
+import { BlockMetadata, ChunkArray, ClusterConfig, ClusterSettingsResult, Seed } from "@/core/types.js";
 import { PointsGenerator } from "@/generator/PointsGenerator.js";
 import { createClusterSettings, selectAvailableOffset } from "./CaveUtils.js";
 import { CaveDataProvider } from "./CaveDataProvider.js";
 import { SeededRandom } from "@/noise/SeededRandom.js";
 import { interpolateClusterValue } from "@/utils/MathHelper.js";
+import { ChunkDataCache3D } from "@/data/cache/ChunkDataCache3D.js";
+import { CaveDataView } from "./CaveDataViewer.js";
 
 function isInsideDecoratableCave(
   x: number,
@@ -33,7 +35,7 @@ export class CaveDecorationGenerator {
     blockMetadata: BlockMetadata,
     chunkSize: number,
     seed: Seed,
-    clusterConfigs: ClusterSettings[] | null = null
+    clusterConfigs: ClusterConfig[] | null = null
   ) {
     this.chunkSize = chunkSize;
     this.seed = seed;
@@ -61,8 +63,8 @@ export class CaveDecorationGenerator {
       }
 
       totalPeakChance += Math.max(
-        config.mE,
-        config.ZI ?? config.mE
+        config.minChance,
+        config.maxChance ?? config.minChance
       );
     }
 
@@ -96,15 +98,15 @@ export class CaveDecorationGenerator {
   getDecorationsForChunkColumn(
     chunkX: number,
     chunkZ: number,
-    chunkStartY: number,
-    chunkHeight: number
+    heightmapVals: ChunkDataCache3D,
+    chunkHeight: CaveDataView
   ) {
     const decorations: any = [];
     const chunkSize = this.chunkSize;
     const chunkEndX = chunkX + chunkSize;
     const chunkEndZ = chunkZ + chunkSize;
 
-    const caveDataProvider = new CaveDataProvider(chunkStartY, chunkHeight, 4, 3);
+    const caveDataProvider = new CaveDataProvider(heightmapVals, chunkHeight, 4, 3);
 
     const centreX = chunkX + (chunkSize >> 1);
     const centreZ = chunkZ + (chunkSize >> 1);
@@ -302,7 +304,7 @@ export class CaveDecorationGenerator {
               x: cellX,
               y: cellY,
               z: cellZ,
-              NI: anchor.NI
+              blockId: anchor.blockId
             });
           }
         }

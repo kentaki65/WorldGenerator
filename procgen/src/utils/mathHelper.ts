@@ -1,5 +1,5 @@
 import { ChunkSize } from "@/core/constants.js";
-import { ClusterSettings, Vec2 } from "@/core/types.js";
+import { ClusterSettingsResult, Vec2 } from "@/core/types.js";
 import { SimpleOctavesNoise } from "@/noise/SimpleOctaveNoise.js";
 import { ThresholdOctaveNoise } from "@/noise/ThresholdOctavesNoise.js";
 
@@ -126,12 +126,10 @@ export function getTotalAmplitude(noiseGenerator: SimpleOctavesNoise ): number {
 //修正必要
 //me = min
 //zi = max
-export function interpolateClusterValue(clusterSettings: ClusterSettings, y: number) {
-  const { minY, maxY, shallowClusterY, deepClusterY } = clusterSettings;
-
-  if (maxY === undefined || shallowClusterY === undefined || deepClusterY === undefined) {
-    return minY;
+export function interpolateClusterValue(clusterSettings: ClusterSettingsResult, y: number): number {
+  const { minChance, maxChance, shallowClusterY, deepClusterY } = clusterSettings;
+  if (maxChance === undefined || shallowClusterY === undefined || deepClusterY === undefined) {
+    return minChance;
   }
-
-  return minY + (maxY - minY) * Math.max(0, Math.min(1, (shallowClusterY - y) / (shallowClusterY - deepClusterY)));
+  return minChance + (maxChance - minChance) * Math.max(0, Math.min(1, (shallowClusterY - y) / (shallowClusterY - deepClusterY)));
 }

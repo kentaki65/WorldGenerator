@@ -28,7 +28,7 @@ export class PointsGenerator {
   name: string;
   seed: string | number;
   minDist: number;
-  cachedCells: PartitionTTLCache;
+  cachedCells: PartitionTTLCache<PointsGeneratorCell>;
   _tempCellCoord: Vec2;
   variableDensitySettings: {
     func: (point: Vec2) => number;
@@ -107,7 +107,7 @@ export class PointsGenerator {
     const cellCoord = this.getCellCoordFromGlobalCoord(x, z);
     const { pointsSet } = this.getCell(cellCoord[0], cellCoord[1]);
 
-    return !!pointsSet.has(`${x}|${z}`);
+    return !!pointsSet!.has(`${x}|${z}`);
   }
 
   getClosestPoint(x: number, z: number): Vec2 {
@@ -154,7 +154,7 @@ export class PointsGenerator {
         for (let cellZ = cellCoord[1] - 1; cellZ <= cellCoord[1] + 1; cellZ++) {
           if (cellCoord[0] !== cellX || cellCoord[1] !== cellZ) {
             surroundingPoints.push(
-              ...this.getCell(cellX, cellZ).points
+              ...this.getCell(cellX, cellZ).points!
             );
           }
         }
@@ -170,9 +170,9 @@ export class PointsGenerator {
     let closestPoint: Vec2 = [0, 0];
     let closestDistance = 100000;
 
-    if (!cell.surroundingPoints) return;
+    const surroundingPoints = cell.surroundingPoints!;
 
-    for (const point of cell.surroundingPoints) {
+    for (const point of surroundingPoints) {
       const pointDistance = getDistance(point, x, z);
 
       if (pointDistance < closestDistance) {
@@ -189,9 +189,8 @@ export class PointsGenerator {
 
     let remainingWeight = distance;
 
-    for (let i = 0; i < cell.surroundingPoints.length; i++) {
-      const point = cell.surroundingPoints[i];
-      if (!point) continue;
+    for (let i = 0; i < surroundingPoints.length; i++) {
+      const point = surroundingPoints[i]!;
 
       if (point[0] === closestPoint[0] && point[1] === closestPoint[1]) {
         continue;

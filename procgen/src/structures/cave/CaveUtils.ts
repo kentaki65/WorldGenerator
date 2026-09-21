@@ -1,5 +1,5 @@
 import { CaveField, OUT_OF_RUNGE_NUMBER } from "@/core/constants.js";
-import { BlockMetadata, BlockName, CaveInterval, ClusterSettings, Vec3 } from "@/core/types.js";
+import { BlockMetadata, BlockName, CaveInterval, ClusterConfig, ClusterSettingsResult, Vec3 } from "@/core/types.js";
 import { CaveDataProvider } from "./CaveDataProvider.js";
 
 interface BlockOffsetOptions {
@@ -19,6 +19,13 @@ const west: Vec3 = [-1, 0, 0];
 const east: Vec3 = [1, 0, 0];
 const north: Vec3 = [0, 0, -1];
 const south: Vec3 = [0, 0, 1];
+
+function getBlockMetadata(
+  blockMetadata: BlockMetadata,
+  key: string
+) {
+  return blockMetadata[key as keyof BlockMetadata]!;
+}
 
 //xI
 export function mergeCaveIntervals(
@@ -118,19 +125,19 @@ export function getBlockOffsets(
     result.push(
       {
         offset: west,
-        blockId: blockMetadata[`${blockName}|meta|rot2|side`].id
+        blockId: getBlockMetadata(blockMetadata, `${blockName}|meta|rot2|side`).id
       },
       {
         offset: east,
-        blockId: blockMetadata[`${blockName}|meta|rot4|side`].id
+        blockId: getBlockMetadata(blockMetadata, `${blockName}|meta|rot4|side`).id
       },
       {
         offset: north,
-        blockId: blockMetadata[`${blockName}|meta|rot1|side`].id
+        blockId: getBlockMetadata(blockMetadata, `${blockName}|meta|rot1|side`).id
       },
       {
         offset: south,
-        blockId: blockMetadata[`${blockName}|meta|rot3|side`].id
+        blockId: getBlockMetadata(blockMetadata, `${blockName}|meta|rot3|side`).id
       }
     );
   }
@@ -138,19 +145,17 @@ export function getBlockOffsets(
   if (options.includeUp) {
     result.push({
       offset: up,
-      blockId: blockMetadata[`${blockName}|meta|rot1|top`].id
+      blockId:getBlockMetadata(blockMetadata, `${blockName}|meta|rot1|top`).id
     });
   }
 
   return result;
 }
 
-//修正必要
-
 export function createClusterSettings(
   blockMetadata: BlockMetadata,
-  clusterConfigs: ClusterSettings[] | null
-) {
+  clusterConfigs: ClusterConfig[] | null
+): ClusterSettingsResult[] {
   if (clusterConfigs === null) {
     return [
       {
@@ -161,45 +166,54 @@ export function createClusterSettings(
           includeUp: true
         }),
         clusterBoxSize: 4,
-        yI: 0.8,
-        oI: 0,
-        mE: 0.12,
-        ZI: 0.25,
+        spawnChance: 0.8,
+        minClusterCells: 0,
+        minChance: 0.12,
+        maxChance: 0.25,
         shallowClusterY: -20,
         deepClusterY: -85
       },
       {
-        seedPrefix: "mushroom",
+        seedPrefix: "Mushroom",
         anchorOptions: getBlockOffsets(blockMetadata, "Glowing Mushroom", {
           includeDown: true,
           includeSides: true,
           includeUp: false
         }),
         clusterBoxSize: 4,
-        yI: 0.7,
-        oI: 2,
-        mE: 0.58
+        spawnChance: 0.7,
+        minClusterCells: 2,
+        minChance: 0.58
       }
     ];
   }
 
   return clusterConfigs.map(clusterConfig => {
-    const clusterYSettings = clusterConfig.kE;
+    const clusterYSettings = clusterConfig.depthSettings;
 
     return {
       seedPrefix: clusterConfig.blockName,
-      anchorOptions: getBlockOffsets(blockMetadata, clusterConfig.blockName, {
-        includeDown: clusterConfig.qI,
-        includeSides: clusterConfig.LI,
-        includeUp: clusterConfig.gI
-      }),
+
+      anchorOptions: getBlockOffsets(
+        blockMetadata,
+        clusterConfig.blockName,
+        {
+          includeDown: clusterConfig.includeDown,
+          includeSides: clusterConfig.includeSides,
+          includeUp: clusterConfig.includeUp
+        }
+      ),
+
       clusterBoxSize: 4,
-      yI: clusterConfig.yI,
-      oI: clusterConfig.oI,
-      mE: clusterConfig.mE,
-      ZI: clusterYSettings?.ZI,
-      shallowClusterY: clusterYSettings?.CI,
-      deepClusterY: clusterYSettings?.cI
+
+      spawnChance: clusterConfig.spawnChance,
+      minClusterCells: clusterConfig.minClusterCells,
+
+      minChance: clusterConfig.minChance,
+      maxChance: clusterYSettings?.maxChance,
+
+      shallowClusterY: clusterYSettings?.shallowClusterY,
+      deepClusterY: clusterYSettings?.deepClusterY
     };
   });
 }
@@ -229,12 +243,12 @@ export function selectAvailableOffset(
   x: number,
   y: number,
   z: number,
-  offsets: any[],
+  offsets: BlockOffset[],
   randomValue: number,
   caveDataProvider: CaveDataProvider
-) {
+): BlockOffset | null{
   let downOffset = null;
-  const availableOffsets = [];
+  const availableOffsets: BlockOffset[] = [];
 
   for (const offset of offsets) {
     if (
@@ -261,5 +275,5 @@ export function selectAvailableOffset(
     return null;
   }
 
-  return availableOffsets[Math.floor(randomValue * availableOffsets.length)];
+  return availableOffsets[Math.floor(randomValue * availableOffsets.length)]!;
 }

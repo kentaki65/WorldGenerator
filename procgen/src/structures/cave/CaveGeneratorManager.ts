@@ -1,4 +1,6 @@
 import { ChunkSize } from "@/core/constants.js";
+import { ChunkArray4D } from "@/data/array/ChunkArray4D.js";
+import { Sparse4DArray } from "@/data/array/Sparse4DArray.js";
 import { divideByChunkSize } from "@/utils/MathHelper.js";
 
 export class CaveGeneratorManager {
@@ -16,11 +18,11 @@ export class CaveGeneratorManager {
     }
   }
 
-  generateAndSet(x: number, y: number, z: number) {
+  generateAndSet(x: number, y: number, caveMetadata: ChunkArray4D | Sparse4DArray) {
     const chunkX = divideByChunkSize(x);
     const chunkZ = divideByChunkSize(y);
 
-    this.getOrCreateCaveGeneratorForChunk(chunkX, chunkZ).generateAndSet(x, y, z);
+    this.getOrCreateCaveGeneratorForChunk(chunkX, chunkZ).generateAndSet(x, y, caveMetadata);
   }
 
   getOrCreateCaveGeneratorForChunk(chunkX: number, chunkZ: number) {

@@ -2,9 +2,9 @@ import { Vec2 } from "@/core/types.js";
 import ndarray from "ndarray";
 
 export class ChunkArray4D {
-  private readonly chunkBottomLeft: Vec2;
-  private readonly chunkTopRight: Vec2;
-  private readonly array;
+  chunkBottomLeft: Vec2;
+  chunkTopRight: Vec2;
+  array;
 
   constructor(size: number, chunkBottomLeft: Vec2, dimension3: number, dimension4: number) {
     this.chunkBottomLeft = chunkBottomLeft;

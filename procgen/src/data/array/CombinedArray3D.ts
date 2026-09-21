@@ -1,9 +1,15 @@
+import { ChunkArray3D } from "./ChunkArray3D.js";
+import { EmptyArray } from "./types.js";
+
 export class CombinedArray3D {
-  sparseArray: any;
-  contiguousArray: any;
+  sparseArray: typeof EmptyArray;
+  contiguousArray: ChunkArray3D;
 
   //型について修正ほしい
-  constructor(sparseArray: any, contiguousArray: any) {
+  constructor(
+    sparseArray: typeof EmptyArray, 
+    contiguousArray: ChunkArray3D
+  ) {
     this.sparseArray = sparseArray;
     this.contiguousArray = contiguousArray;
   }

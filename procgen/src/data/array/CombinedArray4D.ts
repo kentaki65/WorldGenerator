@@ -1,8 +1,11 @@
-export class CombinedArray4D {
-  outerSparseArray: any;
-  innerContiguousArray: any;
+import { ChunkArray4D } from "./ChunkArray4D.js";
+import { EmptyArray } from "./types.js";
 
-  constructor(outerSparseArray: any, innerContiguousArray: any) {
+export class CombinedArray4D {
+  outerSparseArray: typeof EmptyArray;
+  innerContiguousArray: ChunkArray4D;
+
+  constructor(outerSparseArray: typeof EmptyArray, innerContiguousArray: ChunkArray4D) {
     this.outerSparseArray = outerSparseArray;
     this.innerContiguousArray = innerContiguousArray;
   }

@@ -1,23 +1,32 @@
-import { emptyArray } from "@/core/constants.js";
+import { emptyArray, HeightField } from "@/core/constants.js";
 import { CombinedArray3D } from "../array/CombinedArray3D.js";
 import { Sparse3DArray } from "../array/Sparse3DArray.js";
 import { Vec2 } from "@/core/types.js";
 import { ChunkArray3D } from "../array/ChunkArray3D.js";
+import { FixedPointPrefabChunkHeightGenerator } from "@/structures/prefab/FixedPointPrefabChunkHeightGenerator.js";
 
 //型について修正欲しい
 //zH
 export class ChunkDataCache3D {
-  innerContiguousArray: any;
-  generator: any;
+  innerContiguousArray: ChunkArray3D;
+  generator: FixedPointPrefabChunkHeightGenerator;
   outerSparseArray: Sparse3DArray;
 
-  constructor(innerContiguousArray: any, generator: any) {
+  constructor(
+    innerContiguousArray: ChunkArray3D, 
+    generator: FixedPointPrefabChunkHeightGenerator
+  ) {
     this.innerContiguousArray = innerContiguousArray;
     this.generator = generator;
     this.outerSparseArray = new Sparse3DArray();
   }
 
-  static create(size: number, chunkBottomLeft: Vec2, dimension3: number, generator: any) {
+  static create(
+    size: number, 
+    chunkBottomLeft: Vec2, 
+    dimension3: HeightField, 
+    generator: FixedPointPrefabChunkHeightGenerator
+  ) {
     const innerArray = new ChunkArray3D(size, chunkBottomLeft, dimension3);
 
     for (let x = chunkBottomLeft[0]; x < chunkBottomLeft[0] + size; x++) {

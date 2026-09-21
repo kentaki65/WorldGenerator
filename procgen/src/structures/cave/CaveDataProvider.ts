@@ -2,9 +2,10 @@ import { CoordinateGeneratorCache } from "@/data/cache/CoordinateGeneratorCache.
 import { CaveIntervalGenerator } from "./CaveIntervalGenerator.js";
 import { SurfaceLimitedCaveIntervalGenerator } from "./SurfaceLimitedCaveIntervalGenerator.js";
 import { HeightField } from "@/core/constants.js";
+import { ChunkDataCache3D } from "@/data/cache/ChunkDataCache3D.js";
 
 export class CaveDataProvider {
-  heightmapVals: any;
+  heightmapVals: ChunkDataCache3D;
   allCavesCache: any;
   decoratableCavesCache: any;
 

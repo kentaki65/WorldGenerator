@@ -1,8 +1,9 @@
 import { CaveField, HeightField, OUT_OF_RUNGE_NUMBER } from "@/core/constants.js";
+import { ChunkDataCache3D } from "@/data/cache/ChunkDataCache3D.js";
 import { getDistance, getDistanceToSegment } from "@/utils/MathHelper.js";
 
 export class CaveGenerator {
-  heightmapVals: any;
+  heightmapVals: ChunkDataCache3D;
   spaghettiCaveMetadataForChunk: any;
   pitCaveMetadataForChunk: any;
   ravineCaveMetadataForChunk: any;
@@ -12,7 +13,7 @@ export class CaveGenerator {
   static SPAGHETTI_CAVE_EDGE_CUTOFF = 0.08;
 
   constructor(
-    heightmapVals: any,
+    heightmapVals: ChunkDataCache3D,
     spaghettiCaveMetadataForChunk: any,
     pitCaveMetadataForChunk: any,
     ravineCaveMetadataForChunk: any,

@@ -1,5 +1,5 @@
 import { CaveField, HeightField, OUT_OF_RUNGE_NUMBER } from "@/core/constants.js";
-import { BlockId, Vec2 } from "@/core/types.js";
+import { BlockId, BlockMetadata, ChunkArray, Vec2 } from "@/core/types.js";
 import { CaveDataView, InnerChunkCaveDataView } from "./CaveDataViewer.js";
 import { SeededRandom } from "@/noise/SeededRandom.js";
 import { ChunkDataCache4D } from "@/data/cache/ChunkDataCache4D.js";
@@ -15,16 +15,16 @@ export class CaveManager {
   constructor(
     caveGeneratorConfig: any,
     chunkSize: number,
-    caveTypeToBlockIds: BlockId[],
-    caveTypePrioritization: any,
+    blockMetadata: BlockMetadata,
+    BlockName: any | "Lava",
   ) {
     this.chunkSize = chunkSize;
     //洞窟の本体クラス
     this.caveMetadataForChunkCache = new CaveMetadataManager(
       caveGeneratorConfig,
       chunkSize,
-      caveTypeToBlockIds,
-      caveTypePrioritization
+      blockMetadata,
+      BlockName
     );
   }
 
@@ -41,7 +41,7 @@ export class CaveManager {
 
   //chunkArray, chunkX, minY, chunkZ, groundHeightmap, caveData
   static addCavesToChunk(
-    chunkArray: any,
+    chunkArray: ChunkArray,
     chunkX: number,
     minY: number,
     chunkZ: number,
@@ -78,11 +78,15 @@ export class CaveManager {
     }
   }
 
-  getCaveHeightmapVals(x: number, z: number, caveData: any) {
+  getCaveHeightmapVals(
+    x: number, 
+    z: number, 
+    heightmapVals: any
+  ) {
     const chunkCoord: Vec2 = [x, z];
     const caveMetadata = new CaveGeneratorManager(
       this.caveMetadataForChunkCache,
-      caveData,
+      heightmapVals,
       this.chunkSize
     );
 

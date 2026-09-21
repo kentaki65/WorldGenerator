@@ -124,8 +124,7 @@ export class FixedPointPrefabManager {
         topRightZ
       } = prefabInfo;
 
-      const decodedPrefabSchematic =
-        this.getDecodedPrefabSchematic(schematic);
+      const decodedPrefabSchematic = this.getDecodedPrefabSchematic(schematic);
 
       decodedFixedPointPrefabsForChunk.push({
         decodedPrefabSchematic,

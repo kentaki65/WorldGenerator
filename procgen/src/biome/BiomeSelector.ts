@@ -17,6 +17,13 @@ interface BiomeEntry {
   stonesTotalFrequency: number;
 }
 
+export interface BiomeGenerateResult {
+  weight: number;
+  biome: Biome;
+  biomeId: number;
+  biomeModifiers: any | null;
+}
+
 export class BiomeSelector {
   biomePointGen: PointsGenerator;
   biomeOffsetSimplex: SimpleOctavesNoise;
@@ -99,23 +106,17 @@ export class BiomeSelector {
   generate(
     worldX: number,
     worldZ: number
-  ) {
+  ): BiomeGenerateResult[] {
     const offsetX = this.getBiomeXOffset(worldX, worldZ);
     const offsetZ = this.getBiomeZOffset(worldX, worldZ);
     const nearbyPoints = this.biomePointGen.getKClosestPointsWithWeights(worldX + offsetX, worldZ + offsetZ, 60);
-    if(nearbyPoints === undefined) return;
 
     const result = [];
     for (let i = 0; i < nearbyPoints.length; i++) {
       const point = nearbyPoints[i]!;
       const { biome, biomeId } = this.getBiomeForBiomePoint(point.pt);
 
-      const entry: {
-        weight: number;
-        biome: Biome;
-        biomeId: number;
-        biomeModifiers: any | null;
-      } = {
+      const entry: BiomeGenerateResult = {
         weight: point.weight,
         biome,
         biomeId,
@@ -213,8 +214,8 @@ export class BiomeSelector {
     const result = {
       stoneTypeId: stoneTypes[
         selectWeightedIndex(
-          stoneFrequencies, 
-          stonesTotalFrequency, 
+          stoneFrequencies,
+          stonesTotalFrequency,
           new SeededRandom(`${point[0]}|${point[1]}|${this.seed}Modifiers`)
         )
       ].stoneId

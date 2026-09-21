@@ -12,6 +12,7 @@ import { getBlockId, isNullOrUndefined } from "@/utils/utils.js";
 import { CaveGenerator } from "./CaveGenerator.js";
 import { multiplyByChunkSize, normalizeVector2 } from "@/utils/MathHelper.js";
 import { SeededRandom } from "@/noise/SeededRandom.js";
+import { ChunkDataCache3D } from "@/data/cache/ChunkDataCache3D.js";
 
 interface PitCaveMetadata {
   caveType: number;
@@ -28,7 +29,8 @@ interface PitCaveMetadata {
   pitHeightPerturbNoiseGenerator: SimpleOctavesNoise | null;
   pitMidpointYPerturbNoiseGenerator: SimpleOctavesNoise;
 }
-type CaveTypeBlockId = BlockId | WeightedDistribution;
+
+export type CaveTypeBlockId = BlockId | WeightedDistribution<number>;
 
 export function getRangeProperties(range: Range): CaveHeightThreshold {
   const width = range.high - range.low;
@@ -503,7 +505,11 @@ export class CaveMetadataManager {
       .map((entry: CaveType) => entry.caveType);
   }
 
-  getOrCreateCaveGeneratorForChunk(chunkX: number, chunkZ: number, heightmapVals: any) {
+  getOrCreateCaveGeneratorForChunk(
+    chunkX: number, 
+    chunkZ: number, 
+    heightmapVals: ChunkDataCache3D
+  ) {
     const caveMetadataForChunk = this.getOrBuildCaveMetadataForChunk(chunkX, chunkZ);
     return new CaveGenerator(
       heightmapVals,

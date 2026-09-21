@@ -1,4 +1,11 @@
-export function createStoneFrequencyData(stoneFrequencies: any[]) {
+import { BlockId } from "@/core/types.js";
+
+interface StoneType {
+  stoneId: BlockId;
+  frequency: number;
+}
+
+export function createStoneFrequencyData(stoneFrequencies: StoneType[]) {
   let stonesTotalFrequency = 0;
   const frequencyValues: number[] = [];
 
